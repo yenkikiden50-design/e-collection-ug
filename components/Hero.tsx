@@ -22,13 +22,17 @@ export default function Hero() {
 
   return (
     <div className="relative w-full overflow-hidden rounded-base">
-      <div className="relative h-[28rem] overflow-hidden sm:h-[32rem] lg:h-[40rem]">
+      <div className="relative h-[20rem] overflow-hidden sm:h-[30rem] lg:h-[35rem]">
         {slides.map((slide, index) => (
           <div
             key={slide.src}
             className={`absolute inset-0 transition-opacity duration-700 ${index === activeIndex ? 'opacity-100' : 'opacity-0'}`}
           >
-            <img src={slide.src} alt={slide.alt} className="h-full w-full object-cover" />
+            <img
+              src={slide.src}
+              alt={slide.alt}
+              className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+            />
           </div>
         ))}
       </div>

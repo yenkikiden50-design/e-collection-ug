@@ -2,7 +2,7 @@ import { StarIcon } from '@heroicons/react/20/solid'
 
 const product = {
   name: 'Basic Tee 6-Pack',
-  price: '$192',
+  price: 'UGX 35,000',
   href: '#',
   breadcrumbs: [
     { id: 1, name: 'Men', href: '#' },

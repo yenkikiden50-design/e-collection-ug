@@ -11,10 +11,10 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <Section />
         <Product />
         <ProductReviews />
         <Footer />
-        <h1>Welcome</h1>
       </main>
     </>
   );
