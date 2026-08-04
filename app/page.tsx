@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 // import Section from '../components/Section';
 import Product from '../components/Product';
 
-import ProductReviews from '../components/Productreviews';
+
 
 
 export default function Home() {
