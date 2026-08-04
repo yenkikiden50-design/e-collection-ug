@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react'
 
 const slides = [
-  { src: '/images/mens trousers.jpg', alt: "Men's trousers" },
+  { src: '/images/men/shirts/handsome-man-with-hat-posing.jpg', alt: "Men's shirts" },
   { src: '/images/short dress.webp', alt: "Women's dresses" },
-  { src: '/images/suit.jpg', alt: 'Suit' },
-
+  { src: '/images/men/shirts/african man.jpg', alt: "Men's shirts" },
+ 
 ]
 
 export default function Hero() {
@@ -22,7 +22,7 @@ export default function Hero() {
 
   return (
     <div className="relative w-full overflow-hidden rounded-base">
-      <div className="relative h-[20rem] overflow-hidden sm:h-[30rem] lg:h-[35rem]">
+      <div className="relative h-[16rem] overflow-hidden sm:h-[24rem] lg:h-[36rem] xl:h-[40rem]">
         {slides.map((slide, index) => (
           <div
             key={slide.src}
