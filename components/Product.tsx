@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Hero from "./Hero";
-import Section from "./Section";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Page = 'listing' | 'checkout'
@@ -200,9 +198,6 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
       </div>
 
       <div style={{ padding: '0 20px 100px' }}>
-        <Hero />
-        <Section />
-
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 22, marginBottom: 14, scrollbarWidth: 'none' }}>
           {navItems.map(item => {
             const active = selectedNav === item
