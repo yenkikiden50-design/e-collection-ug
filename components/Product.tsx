@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Hero from "./Hero"; // CHANGED: re-added now that Hero.tsx exists in components/
+import Section from "./Section"; // CHANGED: WhatsApp contact bar, rendered above Hero
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Page = 'listing' | 'checkout'
 type CheckoutStep = 1 | 2 | 3
-type NavLine = 'Ladies line' | 'GentleMens line' | 'Electronics' // CHANGED: named type for nav lines
+type NavLine = 'Store' | 'Ladies line' | 'GentleMens' | 'Personal Tech' // CHANGED: added 'Store' line that shows everything
 type SortOption = 'popular' | 'price_asc' | 'price_desc' | 'newest'
 type PaymentMethod = 'mobile_money' | 'cash' | 'card'
 
@@ -15,13 +17,13 @@ interface Product {
   price: number
   originalPrice?: number
   discount?: number
-  category: string // CHANGED: was tied to the ladies-only Category type, now generic string since each line has its own category set
+  category: string
   image: string
   tag?: string
 }
 
-// ─── Data: Ladies line (unchanged from your original PRODUCTS) ───────────────
-const LADIES_PRODUCTS: Product[] = [ // CHANGED: renamed PRODUCTS -> LADIES_PRODUCTS
+// ─── Data: Ladies line ────────────────────────────────────────────────────────
+const LADIES_PRODUCTS: Product[] = [
   { id: 1, name: 'Floral wrap dress', price: 68000, originalPrice: 85000, discount: 20, category: 'Dresses', image: 'https://images.unsplash.com/photo-1696962678565-bee84e6b9cb6?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 2, name: 'Linen blouse', price: 45000, category: 'Tops', image: 'https://images.unsplash.com/photo-1608234807905-4466023792f5?w=400&h=520&fit=crop&auto=format' },
   { id: 3, name: 'Silk midi dress', price: 89000, category: 'Dresses', image: 'https://images.unsplash.com/photo-1709809081557-78f803ce93a0?w=400&h=520&fit=crop&auto=format', tag: 'New' },
@@ -36,7 +38,7 @@ const LADIES_PRODUCTS: Product[] = [ // CHANGED: renamed PRODUCTS -> LADIES_PROD
   { id: 12, name: 'Rattan basket bag', price: 58000, category: 'Bags', image: 'https://images.unsplash.com/photo-1732963878674-651e7f5f71d7?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// CHANGED: new dataset for GentleMens line
+// ─── Data: GentleMens ──────────────────────────────────────────────────────────
 const MENS_PRODUCTS: Product[] = [
   { id: 101, name: 'Slim fit shirt', price: 52000, category: 'Shirts', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 102, name: 'Chino trousers', price: 60000, originalPrice: 75000, discount: 20, category: 'Trousers', image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=520&fit=crop&auto=format' },
@@ -50,7 +52,7 @@ const MENS_PRODUCTS: Product[] = [
   { id: 110, name: 'Bomber jacket', price: 95000, originalPrice: 120000, discount: 21, category: 'Jackets', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// CHANGED: new dataset for Electronics
+// ─── Data: Personal Tech ───────────────────────────────────────────────────────
 const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 201, name: 'Wireless ear buds', price: 60000, category: 'Audio', image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 202, name: 'Smartphone 128GB', price: 850000, originalPrice: 950000, discount: 11, category: 'Phones', image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=520&fit=crop&auto=format' },
@@ -62,18 +64,28 @@ const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 208, name: 'Power bank 20000mAh', price: 55000, category: 'Accessories', image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// CHANGED: map each nav line to its own category list
+// CHANGED: 'Store' combines every product from every line into one feed. IDs are
+// re-namespaced (+10000) so items from different lines can never share a React key.
+const ALL_PRODUCTS: Product[] = [
+  ...LADIES_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
+  ...MENS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
+  ...ELECTRONICS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
+]
+
+// CHANGED: map each nav line to its own category list — 'Store' gets the union of all categories
 const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
+  'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
   'Ladies line': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps'],
-  'GentleMens line': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Bags', 'Caps'],
-  'Electronics': ['All', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
+  'GentleMens': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Bags', 'Caps'],
+  'Personal Tech': ['All', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
 }
 
-// CHANGED: map each nav line to its own product list
+// CHANGED: map each nav line to its own product list — 'Store' pulls from ALL_PRODUCTS
 const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
+  'Store': ALL_PRODUCTS,
   'Ladies line': LADIES_PRODUCTS,
-  'GentleMens line': MENS_PRODUCTS,
-  'Electronics': ELECTRONICS_PRODUCTS,
+  'GentleMens': MENS_PRODUCTS,
+  'Personal Tech': ELECTRONICS_PRODUCTS,
 }
 
 const ORDER_ITEMS = [
@@ -86,7 +98,7 @@ function fmt(n: number) {
   return `UGX ${n.toLocaleString()}`
 }
 
-// ─── Icons (unchanged) ────────────────────────────────────────────────────────
+// ─── Icons ─────────────────────────────────────────────────────────────────────
 const BackIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -122,14 +134,14 @@ const LockIcon = () => (
   </svg>
 )
 
-// ─── Main App (unchanged) ─────────────────────────────────────────────────────
+// ─── Main App ────────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage] = useState<Page>('listing')
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(2)
   const [cartCount] = useState(2)
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
       {page === 'listing' && (
         <ListingPage cartCount={cartCount} onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }} />
       )}
@@ -142,20 +154,17 @@ export default function App() {
 
 // ─── Listing Page ─────────────────────────────────────────────────────────────
 function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout: () => void }) {
-  const [selectedNav, setSelectedNav] = useState<NavLine>('Ladies line') // CHANGED: moved above activeCategory, typed as NavLine
-  const [activeCategory, setActiveCategory] = useState<string>('All') // CHANGED: default 'All' instead of 'Dresses' (was ladies-specific)
+  const [selectedNav, setSelectedNav] = useState<NavLine>('Store') // CHANGED: default lands shoppers on the full catalog
+  const [activeCategory, setActiveCategory] = useState<string>('All')
   const [sort, setSort] = useState<SortOption>('popular')
   const [showSortMenu, setShowSortMenu] = useState(false)
   const [wishlist, setWishlist] = useState<number[]>([3, 7])
 
-  const navItems: NavLine[] = ['Ladies line', 'GentleMens line', 'Electronics']
+  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMens', 'Personal Tech'] // CHANGED: added 'Store' pill
 
-  // CHANGED: pull the right category list + product list for the active line
   const categories = CATEGORIES_BY_LINE[selectedNav]
   const lineProducts = PRODUCTS_BY_LINE[selectedNav]
 
-  // CHANGED: reset category filter whenever the line changes, so you don't land
-  // on e.g. GentleMens line with activeCategory still set to "Dresses"
   useEffect(() => {
     setActiveCategory('All')
   }, [selectedNav])
@@ -167,7 +176,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
     newest: 'Newest first',
   }
 
-  const visible = lineProducts.filter(p => activeCategory === 'All' || p.category === activeCategory) // CHANGED: PRODUCTS -> lineProducts
+  const visible = lineProducts.filter(p => activeCategory === 'All' || p.category === activeCategory)
   const sorted = [...visible].sort((a, b) => {
     if (sort === 'price_asc') return a.price - b.price
     if (sort === 'price_desc') return b.price - a.price
@@ -175,7 +184,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
   })
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative' }}>
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
       {/* Top Nav */}
       <div style={{ backgroundColor: '#FFF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30, borderBottom: '1px solid #E8E4DE' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -183,8 +192,8 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
             <div className="ml-2 flex lg:ml-0">
               <a href="#" className="flex flex-col leading-none">
                 <span className="sr-only">e-collections.ug</span>
-                <span aria-hidden="true" className="text-base font-semibold tracking-tight text-gray-900">
-                  e-Collections<span style={{ color: '#C4562A' }}>.ug</span>
+                <span aria-hidden="true" className="text-base font-medium tracking-tight text-gray-900">
+                  E-Collections<span style={{ color: '#C4562A' }}>.ug</span>
                 </span>
               </a>
             </div>
@@ -197,6 +206,12 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
         </div>
       </div>
 
+      <div style={{ padding: '16px 20px 0' }}>
+        <Hero /> {/* CHANGED: hero banner slideshow sits at the top of the page */}
+      </div>
+
+      <Section /> {/* CHANGED: WhatsApp contact bar sits immediately below the hero */}
+
       <div style={{ padding: '0 20px 100px' }}>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 22, marginBottom: 14, scrollbarWidth: 'none' }}>
           {navItems.map(item => {
@@ -208,9 +223,9 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
                 style={{
                   padding: '9px 14px', borderRadius: 24, fontSize: 13, fontWeight: active ? 600 : 500,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                  fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
-                  backgroundColor: active ? '#C8E6D4' : '#F5F3EF',
-                  color: active ? '#1B5E3E' : '#4A4A4A',
+                  transition: 'all 0.15s',
+                  backgroundColor: active ? '#16A34A' : '#F5F3EF',
+                  color: active ? '#FFFFFF' : '#4A4A4A',
                 }}
               >
                 {item}
@@ -222,17 +237,17 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 8, marginBottom: 20 }}>
           <div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.2, marginBottom: 2 }}>{selectedNav}</h1> {/* CHANGED: was hardcoded "Ladies' line" */}
-            <p style={{ fontSize: 13, color: '#717171' }}>{lineProducts.length} products</p> {/* CHANGED: was hardcoded "128 products" */}
+            <h1 className="text-2xl font-bold tracking-tight text-black mb-1">{selectedNav}</h1>
+            <p className="text-base font-medium text-slate-500">{lineProducts.length} products</p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
+            <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontWeight: 500 }}>
               <FilterIcon /> Filter
             </button>
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowSortMenu(v => !v)}
-                style={{ padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontWeight: 500, whiteSpace: 'nowrap' }}
+                style={{ padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}
               >
                 {sortLabels[sort]}
               </button>
@@ -242,7 +257,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
                     <button
                       key={key}
                       onClick={() => { setSort(key); setShowSortMenu(false) }}
-                      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px', background: 'none', border: 'none', fontSize: 13, color: sort === key ? '#1B5E3E' : '#1A1A1A', fontWeight: sort === key ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
+                      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px', background: 'none', border: 'none', fontSize: 13, color: sort === key ? '#1B5E3E' : '#1A1A1A', fontWeight: sort === key ? 600 : 400, cursor: 'pointer' }}
                     >
                       {label}
                     </button>
@@ -255,7 +270,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
 
         {/* Category Pills */}
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 22, scrollbarWidth: 'none' }}>
-          {categories.map(cat => { {/* CHANGED: CATEGORIES -> categories (line-specific) */}
+          {categories.map(cat => {
             const active = activeCategory === cat
             return (
               <button
@@ -264,7 +279,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
                 style={{
                   padding: '9px 18px', borderRadius: 24, fontSize: 14, fontWeight: active ? 600 : 400,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                  fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
+                  transition: 'all 0.15s',
                   backgroundColor: active ? '#C8E6D4' : '#E8E4DE',
                   color: active ? '#1B5E3E' : '#4A4A4A',
                 }}
@@ -294,7 +309,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
       <div style={{ position: 'fixed', inset: 'auto 0 0', margin: '0 auto', width: '100%', maxWidth: 480, left: 0, right: 0, bottom: 0, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 999 }}>
         <button
           onClick={onCheckout}
-          style={{ width: '100%', padding: '15px', backgroundColor: '#1B5E3E', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.01em' }}
+          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', letterSpacing: '0.01em' }}
         >
           View cart & checkout (2)
         </button>
@@ -303,7 +318,7 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
   )
 }
 
-// ─── Product Card (unchanged) ─────────────────────────────────────────────────
+// ─── Product Card ──────────────────────────────────────────────────────────────
 function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Product; wishlisted: boolean; onToggleWishlist: () => void }) {
   const [imgError, setImgError] = useState(false)
 
@@ -340,9 +355,9 @@ function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Produ
         </button>
       </div>
       <div style={{ padding: '11px 12px 14px' }}>
-        <p style={{ fontSize: 13.5, fontWeight: 500, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 5 }}>{product.name}</p>
+        <p style={{ fontSize: 13.5, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 5 }}>{product.name}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#1B5E3E' }}>{fmt(product.price)}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#16A34A' }}>{fmt(product.price)}</span>
           {product.originalPrice && (
             <span style={{ fontSize: 11, color: '#9A9590', textDecoration: 'line-through' }}>{fmt(product.originalPrice)}</span>
           )}
@@ -363,7 +378,7 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF' }}>
       <div style={{ backgroundColor: '#F5F3EF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E8E4DE', position: 'sticky', top: 0, zIndex: 30 }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
           <BackIcon /> Back
         </button>
         <div>
@@ -375,6 +390,10 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
       </div>
 
       <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
+        <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 18 }}>🚚</span>
+          <span style={{ fontSize: 14 }}>Free delivery on checkout orders</span>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {steps.map((s, i) => {
             const done = step > s.n
@@ -412,13 +431,13 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
         {step < 3 ? (
           <button
             onClick={() => onStepChange((step + 1) as CheckoutStep)}
-            style={{ width: '100%', padding: '15px', backgroundColor: '#1B5E3E', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
+            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
             {step === 1 ? 'Continue to Payment' : 'Confirm & Pay'}
           </button>
         ) : (
           <button
-            style={{ width: '100%', padding: '15px', backgroundColor: '#1B5E3E', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
+            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
             Track my order
           </button>
@@ -433,7 +452,7 @@ function DeliveryStep() {
   const inputStyle = {
     width: '100%', padding: '13px 15px', borderRadius: 12, border: '1.5px solid #DDD9D3',
     backgroundColor: '#fff', fontSize: 14, color: '#1A1A1A', outline: 'none',
-    fontFamily: "'DM Sans', sans-serif", boxSizing: 'border-box' as const,
+    boxSizing: 'border-box' as const,
   }
   return (
     <div>
@@ -489,7 +508,7 @@ function PaymentStep() {
               key={m.key}
               onClick={() => setMethod(m.key)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', borderRadius: 14, textAlign: 'left', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
+                display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', borderRadius: 14, textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s',
                 border: `2px solid ${active ? '#1B5E3E' : '#DDD9D3'}`,
                 backgroundColor: active ? '#EAF5EE' : '#fff',
               }}
@@ -513,7 +532,7 @@ function PaymentStep() {
             value={mobileNumber}
             onChange={e => setMobileNumber(e.target.value)}
             placeholder="07XX XXX XXX"
-            style={{ width: '100%', padding: '15px 18px', borderRadius: 14, border: 'none', backgroundColor: '#1A1A1A', color: '#fff', fontSize: 16, fontWeight: 500, outline: 'none', fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.04em', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '15px 18px', borderRadius: 14, border: 'none', backgroundColor: '#1A1A1A', color: '#fff', fontSize: 16, fontWeight: 500, outline: 'none', letterSpacing: '0.04em', boxSizing: 'border-box' }}
           />
         </div>
       )}

@@ -22,7 +22,7 @@ export default function Hero() {
 
   return (
     <div className="relative w-full overflow-hidden rounded-base">
-      <div className="relative h-[16rem] overflow-hidden sm:h-[24rem] lg:h-[36rem] xl:h-[40rem]">
+      <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9] lg:aspect-[16/8]">
         {slides.map((slide, index) => (
           <div
             key={slide.src}
