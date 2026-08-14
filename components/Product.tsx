@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import Hero from "./Hero"; // CHANGED: re-added now that Hero.tsx exists in components/
 import Section from "./Section"; // CHANGED: WhatsApp contact bar, rendered above Hero
+import Navbar from "./Navbar";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Page = 'listing' | 'checkout'
 type CheckoutStep = 1 | 2 | 3
-type NavLine = 'Store' | 'Ladies line' | 'GentleMens' | 'Personal Tech' // CHANGED: added 'Store' line that shows everything
+type NavLine = 'Store' | 'Ladies line' | 'GentleMens' | 'Personal Tech'
 type SortOption = 'popular' | 'price_asc' | 'price_desc' | 'newest'
 type PaymentMethod = 'mobile_money' | 'cash' | 'card'
 
@@ -22,7 +23,6 @@ interface Product {
   tag?: string
 }
 
-// ─── Data: Ladies line ────────────────────────────────────────────────────────
 const LADIES_PRODUCTS: Product[] = [
   { id: 1, name: 'Floral wrap dress', price: 68000, originalPrice: 85000, discount: 20, category: 'Dresses', image: 'https://images.unsplash.com/photo-1696962678565-bee84e6b9cb6?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 2, name: 'Linen blouse', price: 45000, category: 'Tops', image: 'https://images.unsplash.com/photo-1608234807905-4466023792f5?w=400&h=520&fit=crop&auto=format' },
@@ -38,7 +38,6 @@ const LADIES_PRODUCTS: Product[] = [
   { id: 12, name: 'Rattan basket bag', price: 58000, category: 'Bags', image: 'https://images.unsplash.com/photo-1732963878674-651e7f5f71d7?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// ─── Data: GentleMens ──────────────────────────────────────────────────────────
 const MENS_PRODUCTS: Product[] = [
   { id: 101, name: 'Slim fit shirt', price: 52000, category: 'Shirts', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 102, name: 'Chino trousers', price: 60000, originalPrice: 75000, discount: 20, category: 'Trousers', image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=520&fit=crop&auto=format' },
@@ -52,7 +51,6 @@ const MENS_PRODUCTS: Product[] = [
   { id: 110, name: 'Bomber jacket', price: 95000, originalPrice: 120000, discount: 21, category: 'Jackets', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// ─── Data: Personal Tech ───────────────────────────────────────────────────────
 const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 201, name: 'Wireless ear buds', price: 60000, category: 'Audio', image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 202, name: 'Smartphone 128GB', price: 850000, originalPrice: 950000, discount: 11, category: 'Phones', image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=520&fit=crop&auto=format' },
@@ -64,15 +62,12 @@ const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 208, name: 'Power bank 20000mAh', price: 55000, category: 'Accessories', image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// CHANGED: 'Store' combines every product from every line into one feed. IDs are
-// re-namespaced (+10000) so items from different lines can never share a React key.
 const ALL_PRODUCTS: Product[] = [
   ...LADIES_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
   ...MENS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
   ...ELECTRONICS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
 ]
 
-// CHANGED: map each nav line to its own category list — 'Store' gets the union of all categories
 const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
   'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
   'Ladies line': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps'],
@@ -80,7 +75,6 @@ const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
   'Personal Tech': ['All', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
 }
 
-// CHANGED: map each nav line to its own product list — 'Store' pulls from ALL_PRODUCTS
 const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
   'Store': ALL_PRODUCTS,
   'Ladies line': LADIES_PRODUCTS,
@@ -98,7 +92,6 @@ function fmt(n: number) {
   return `UGX ${n.toLocaleString()}`
 }
 
-// ─── Icons ─────────────────────────────────────────────────────────────────────
 const BackIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -134,7 +127,6 @@ const LockIcon = () => (
   </svg>
 )
 
-// ─── Main App ────────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage] = useState<Page>('listing')
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(2)
@@ -152,15 +144,14 @@ export default function App() {
   )
 }
 
-// ─── Listing Page ─────────────────────────────────────────────────────────────
 function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout: () => void }) {
-  const [selectedNav, setSelectedNav] = useState<NavLine>('Store') // CHANGED: default lands shoppers on the full catalog
+  const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
   const [activeCategory, setActiveCategory] = useState<string>('All')
   const [sort, setSort] = useState<SortOption>('popular')
   const [showSortMenu, setShowSortMenu] = useState(false)
   const [wishlist, setWishlist] = useState<number[]>([3, 7])
 
-  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMens', 'Personal Tech'] // CHANGED: added 'Store' pill
+  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMens', 'Personal Tech']
 
   const categories = CATEGORIES_BY_LINE[selectedNav]
   const lineProducts = PRODUCTS_BY_LINE[selectedNav]
@@ -185,32 +176,13 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
 
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
-      {/* Top Nav */}
-      <div style={{ backgroundColor: '#FFF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', borderBottom: '1px solid #E8E4DE' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div>
-            <div className="ml-2 flex lg:ml-0">
-              <a href="#" className="flex flex-col leading-none">
-                <span className="sr-only">e-collections.ug</span>
-                <span aria-hidden="true" className="text-2xl font-bold tracking-tight text-black mb-1">
-                  E-Collections<span style={{ color: '#C4562A' }}>.ug</span>
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          <button onClick={onCheckout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A' }}>
-            <CartIcon count={cartCount} />
-          </button>
-        </div>
-      </div>
+      <Navbar cartCount={cartCount} onCheckout={onCheckout} />
 
       <div style={{ padding: '16px 20px 0' }}>
-        <Hero /> {/* CHANGED: hero banner slideshow sits at the top of the page */}
+        <Hero />
       </div>
 
-      <Section /> {/* CHANGED: WhatsApp contact bar sits immediately below the hero */}
+      <Section />
 
       <div style={{ padding: '0 20px 100px' }}>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 22, marginBottom: 14, scrollbarWidth: 'none' }}>
@@ -234,7 +206,6 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
           })}
         </div>
 
-        {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 8, marginBottom: 20 }}>
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-0">{selectedNav}</h1>
@@ -268,7 +239,6 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
           </div>
         </div>
 
-        {/* Category Pills */}
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 22, scrollbarWidth: 'none' }}>
           {categories.map(cat => {
             const active = activeCategory === cat
@@ -290,7 +260,6 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
           })}
         </div>
 
-        {/* Product Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           {sorted.map(product => (
             <ProductCard key={product.id} product={product} wishlisted={wishlist.includes(product.id)} onToggleWishlist={() => setWishlist(w => w.includes(product.id) ? w.filter(x => x !== product.id) : [...w, product.id])} />
@@ -305,7 +274,6 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
         )}
       </div>
 
-      {/* Bottom Checkout CTA */}
       <div style={{ position: 'fixed', inset: 'auto 0 0', margin: '0 auto', width: '100%', maxWidth: 480, left: 0, right: 0, bottom: 0, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 999 }}>
         <button
           onClick={onCheckout}
@@ -318,7 +286,6 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
   )
 }
 
-// ─── Product Card ──────────────────────────────────────────────────────────────
 function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Product; wishlisted: boolean; onToggleWishlist: () => void }) {
   const [imgError, setImgError] = useState(false)
 
@@ -367,7 +334,6 @@ function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Produ
   )
 }
 
-// ─── Checkout Page ────────────────────────────────────────────────────────────
 function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onStepChange: (s: CheckoutStep) => void; onBack: () => void }) {
   const steps: { label: string; n: CheckoutStep }[] = [
     { label: 'Delivery', n: 1 },
@@ -390,7 +356,9 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
       </div>
 
       <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
-        <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* CHANGED: sticky (not fixed) — scrolls normally with the page, then locks in place
+            once its top edge reaches the checkout header (64px tall) and stays pinned there */}
+        <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 64, zIndex: 25 }}>
           <span style={{ fontSize: 18 }}>🚚</span>
           <span style={{ fontSize: 14 }}>Free delivery on checkout orders</span>
         </div>
@@ -447,7 +415,6 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
   )
 }
 
-// ─── Delivery Step ────────────────────────────────────────────────────────────
 function DeliveryStep() {
   const inputStyle = {
     width: '100%', padding: '13px 15px', borderRadius: 12, border: '1.5px solid #DDD9D3',
@@ -486,7 +453,6 @@ function DeliveryStep() {
   )
 }
 
-// ─── Payment Step ─────────────────────────────────────────────────────────────
 function PaymentStep() {
   const [method, setMethod] = useState<PaymentMethod>('mobile_money')
   const [mobileNumber, setMobileNumber] = useState('')
@@ -542,7 +508,6 @@ function PaymentStep() {
   )
 }
 
-// ─── Confirm Step ─────────────────────────────────────────────────────────────
 function ConfirmStep() {
   const total = ORDER_ITEMS.reduce((s, i) => s + i.price, 0) + DELIVERY_FEE
   return (
@@ -582,7 +547,6 @@ function ConfirmStep() {
   )
 }
 
-// ─── Order Summary Component ──────────────────────────────────────────────────
 function OrderSummary() {
   const subtotal = ORDER_ITEMS.reduce((s, i) => s + i.price, 0)
   const total = subtotal + DELIVERY_FEE
