@@ -1,26 +1,21 @@
-'use client'
+"use client"
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 
 export default function Section() {
   return (
     <div className="w-full bg-white">
       <div className="mx-auto w-full max-w-[420px] overflow-hidden rounded-none bg-white">
         <header className="relative bg-white">
-        {/* <p className="flex h-10 items-center justify-center bg-indigo-700 px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
-           <i className="fa-brands fa-whatsapp"></i>
-            WhatsApp us at: +256751792211 / +256780496217
-          </p> */}
-      
-           <p className="flex h-5 w-full items-center justify-center gap-1 bg-amber-700 px-1 text-[9px] font-medium text-white sm:h-6 sm:px-3 sm:text-[10px] lg:px-4">
-    <i className="fa-brands fa-whatsapp text-[9px] sm:text-[10px]"></i>
-    <span className="whitespace-nowrap">WhatsApp us at:</span>{' '}
-    <a href="tel:+256751792211" className="underline hover:text-amber-100">
-      +256751792211
-    </a>
-    {' / '}
-    <a href="tel:+256785921646" className="underline hover:text-amber-100">
-      +256785921646
-    </a>
-  </p>
+          <p className="flex h-5 w-full items-center justify-center gap-1 px-1 text-[12px] font-medium text-slate-700 sm:h-6 sm:px-2 sm:text-[13px] lg:px-4">
+            <span className="whitespace-nowrap">WhatsApp us</span>
+            <a href="https://wa.me/256751792211" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp +256751792211" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, background: '#16A34A', borderRadius: 999, color: '#fff' }}>
+                <FontAwesomeIcon icon={faWhatsapp} style={{ color: 'white', width: 16, height: 16 }} />
+              </span>
+            </a>
+          </p>
 
 
 

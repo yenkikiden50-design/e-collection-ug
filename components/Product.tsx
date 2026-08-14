@@ -186,13 +186,13 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
       {/* Top Nav */}
-      <div style={{ backgroundColor: '#FFF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30, borderBottom: '1px solid #E8E4DE' }}>
+      <div style={{ backgroundColor: '#FFF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', borderBottom: '1px solid #E8E4DE' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div>
             <div className="ml-2 flex lg:ml-0">
               <a href="#" className="flex flex-col leading-none">
                 <span className="sr-only">e-collections.ug</span>
-                <span aria-hidden="true" className="text-base font-medium tracking-tight text-gray-900">
+                <span aria-hidden="true" className="text-2xl font-bold tracking-tight text-black mb-1">
                   E-Collections<span style={{ color: '#C4562A' }}>.ug</span>
                 </span>
               </a>
@@ -237,11 +237,11 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 8, marginBottom: 20 }}>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-black mb-1">{selectedNav}</h1>
-            <p className="text-base font-medium text-slate-500">{lineProducts.length} products</p>
+            <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-0">{selectedNav}</h1>
+            <p className="text-base font-medium text-slate-400">{lineProducts.length} products</p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontWeight: 500 }}>
+            <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontWeight: 400 }}>
               <FilterIcon /> Filter
             </button>
             <div style={{ position: 'relative' }}>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 const slides = [
-  { src: '/images/men/shirts/handsome-man-with-hat-posing.jpg', alt: "Men's shirts" },
+  { src: '/images/men/shirts/headsets.jpg', alt: "Personal Tech" },
   { src: '/images/short dress.webp', alt: "Women's dresses" },
   { src: '/images/men/shirts/african man.jpg', alt: "Men's shirts" },
  
