@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Hero from "./Hero"; // CHANGED: re-added now that Hero.tsx exists in components/
-import Section from "./Section"; // CHANGED: WhatsApp contact bar, rendered above Hero
+import Hero from "./Hero";
+import Section from "./Section";
 import Navbar from "./Navbar";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -177,6 +177,10 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
       <Navbar cartCount={cartCount} onCheckout={onCheckout} />
+
+      {/* CHANGED: spacer reserves space for the now-fixed Navbar (promo bar ~24px + logo row ~57px = ~81px)
+          so Hero and page content don't render underneath it */}
+      <div style={{ height: 81 }} />
 
       <div style={{ padding: '16px 20px 0' }}>
         <Hero />
@@ -356,8 +360,6 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
       </div>
 
       <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
-        {/* CHANGED: sticky (not fixed) — scrolls normally with the page, then locks in place
-            once its top edge reaches the checkout header (64px tall) and stays pinned there */}
         <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 64, zIndex: 25 }}>
           <span style={{ fontSize: 18 }}>🚚</span>
           <span style={{ fontSize: 14 }}>Free delivery on checkout orders</span>
