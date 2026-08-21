@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, Dispatch, SetStateAction, ChangeEvent } from "react";
 import Hero from "./Hero";
 import Section from "./Section";
 import Navbar from "./Navbar";
@@ -21,6 +21,19 @@ interface Product {
   category: string
   image: string
   tag?: string
+}
+
+interface CartItem {
+  product: Product
+  quantity: number
+}
+
+interface DeliveryInfo {
+  firstName: string
+  lastName: string
+  phone: string
+  area: string
+  landmark: string
 }
 
 const LADIES_PRODUCTS: Product[] = [
@@ -82,14 +95,58 @@ const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
   'Personal Tech': ELECTRONICS_PRODUCTS,
 }
 
-const ORDER_ITEMS = [
-  { name: 'Floral wrap dress (M)', price: 68000 },
-  { name: 'Wireless ear buds', price: 60000 },
-]
 const DELIVERY_FEE = 5000
+// WhatsApp number in full international format, no leading 0 or +
+const WHATSAPP_NUMBER = '256746240983'
 
 function fmt(n: number) {
   return `UGX ${n.toLocaleString()}`
+}
+
+function buildWhatsAppMessage(cartItems: CartItem[], delivery: DeliveryInfo, method: PaymentMethod, mobileNumber: string) {
+  const lines: string[] = []
+  const fullName = `${delivery.firstName} ${delivery.lastName}`.trim()
+  const now = new Date()
+  const timestamp = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
+    ', ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+
+  lines.push('New Order — E-Collections.ug')
+  lines.push(timestamp)
+  lines.push('')
+
+  lines.push('*Contact:*')
+  if (fullName) lines.push(fullName)
+  if (delivery.phone) lines.push(`Phone: ${delivery.phone}`)
+  if (delivery.area) lines.push(`Area: ${delivery.area}`)
+  if (delivery.landmark) lines.push(`Landmark: ${delivery.landmark}`)
+  lines.push('')
+
+  lines.push('*Items:*')
+  if (cartItems.length === 0) {
+    lines.push('(cart is empty)')
+  } else {
+    cartItems.forEach((item, i) => {
+      lines.push(`${i + 1}. ${item.product.name}${item.quantity > 1 ? ` x${item.quantity}` : ''} — ${fmt(item.product.price * item.quantity)}`)
+    })
+  }
+  lines.push('')
+
+  const subtotal = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0)
+  const hasItems = cartItems.length > 0
+  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
+  lines.push(`*Subtotal:* ${fmt(subtotal)}`)
+  if (hasItems) lines.push(`*Delivery:* ${fmt(DELIVERY_FEE)}`)
+  lines.push(`*Total:* ${fmt(total)}`)
+  lines.push('')
+
+  const methodLabel = method === 'mobile_money'
+    ? (mobileNumber ? `Mobile Money (${mobileNumber})` : 'Mobile Money')
+    : method === 'cash'
+    ? 'Cash on delivery'
+    : 'Card payment'
+  lines.push(`*Payment:* ${methodLabel}`)
+
+  return lines.join('\n')
 }
 
 const BackIcon = () => (
@@ -130,36 +187,57 @@ const LockIcon = () => (
 export default function App() {
   const [page, setPage] = useState<Page>('listing')
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(2)
-  const [cartCount, setCartCount] = useState(0)
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
       {page === 'listing' && (
-        <ListingPage cartCount={cartCount} setCartCount={setCartCount} onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }} />
+        <ListingPage cartItems={cartItems} setCartItems={setCartItems} onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }} />
       )}
       {page === 'checkout' && (
-        <CheckoutPage step={checkoutStep} onStepChange={setCheckoutStep} onBack={() => setPage('listing')} />
+        <CheckoutPage step={checkoutStep} onStepChange={setCheckoutStep} onBack={() => setPage('listing')} cartItems={cartItems} />
       )}
     </div>
   )
 }
 
-function ListingPage({ cartCount, setCartCount, onCheckout }: { cartCount: number; setCartCount: Dispatch<SetStateAction<number>>; onCheckout: () => void }) {
+function ListingPage({ cartItems, setCartItems, onCheckout }: { cartItems: CartItem[]; setCartItems: Dispatch<SetStateAction<CartItem[]>>; onCheckout: () => void }) {
   const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
   const [activeCategory, setActiveCategory] = useState<string>('All')
   const [sort, setSort] = useState<SortOption>('popular')
   const [showSortMenu, setShowSortMenu] = useState(false)
   const [wishlist, setWishlist] = useState<number[]>([])
 
-  const toggleWishlist = (productId: number) => {
-    const isWishlisted = wishlist.includes(productId)
-    setWishlist(w => isWishlisted ? w.filter(x => x !== productId) : [...w, productId])
-    // Selecting (wishlisting) an item adds 1 to the cart count; deselecting deducts 1
-    setCartCount(c => isWishlisted ? Math.max(0, c - 1) : c + 1)
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+
+  const addToCart = (product: Product) => {
+    setCartItems(items => {
+      const existing = items.find(i => i.product.id === product.id)
+      if (existing) {
+        return items.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
+      }
+      return [...items, { product, quantity: 1 }]
+    })
   }
 
-  const addToCart = () => {
-    setCartCount(count => count + 1)
+  const removeOneFromCart = (productId: number) => {
+    setCartItems(items => {
+      const existing = items.find(i => i.product.id === productId)
+      if (!existing) return items
+      if (existing.quantity <= 1) return items.filter(i => i.product.id !== productId)
+      return items.map(i => i.product.id === productId ? { ...i, quantity: i.quantity - 1 } : i)
+    })
+  }
+
+  const toggleWishlist = (product: Product) => {
+    const isWishlisted = wishlist.includes(product.id)
+    setWishlist(w => isWishlisted ? w.filter(x => x !== product.id) : [...w, product.id])
+    // Selecting (wishlisting) an item adds it to the cart; deselecting removes one unit
+    if (isWishlisted) {
+      removeOneFromCart(product.id)
+    } else {
+      addToCart(product)
+    }
   }
 
   const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMens', 'Personal Tech']
@@ -281,8 +359,8 @@ function ListingPage({ cartCount, setCartCount, onCheckout }: { cartCount: numbe
               key={product.id}
               product={product}
               wishlisted={wishlist.includes(product.id)}
-              onToggleWishlist={() => toggleWishlist(product.id)}
-              onAddToCart={addToCart}
+              onToggleWishlist={() => toggleWishlist(product)}
+              onAddToCart={() => addToCart(product)}
             />
           ))}
         </div>
@@ -381,12 +459,36 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart }: { p
   )
 }
 
-function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onStepChange: (s: CheckoutStep) => void; onBack: () => void }) {
+function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: CheckoutStep; onStepChange: (s: CheckoutStep) => void; onBack: () => void; cartItems: CartItem[] }) {
   const steps: { label: string; n: CheckoutStep }[] = [
     { label: 'Delivery', n: 1 },
     { label: 'Payment', n: 2 },
     { label: 'Confirm', n: 3 },
   ]
+
+  const [delivery, setDelivery] = useState<DeliveryInfo>({
+    firstName: '', lastName: '', phone: '', area: '', landmark: '',
+  })
+  const [method, setMethod] = useState<PaymentMethod>('mobile_money')
+  const [mobileNumber, setMobileNumber] = useState('')
+  const [showValidation, setShowValidation] = useState(false)
+
+  const isContactInfoValid = delivery.firstName.trim() !== '' && delivery.phone.trim() !== '' && delivery.area.trim() !== ''
+
+  const sendToWhatsApp = () => {
+    const message = buildWhatsAppMessage(cartItems, delivery, method, mobileNumber)
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+    window.open(url, '_blank')
+  }
+
+  const handlePrimaryAction = () => {
+    if (step === 2 && !isContactInfoValid) {
+      // Block advancing to Confirm until name, phone, and location are filled
+      setShowValidation(true)
+      return
+    }
+    onStepChange((step + 1) as CheckoutStep)
+  }
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF' }}>
@@ -435,21 +537,22 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
       </div>
 
       <div style={{ padding: '24px 20px 100px' }}>
-        {step === 1 && <DeliveryStep />}
-        {step === 2 && <PaymentStep />}
-        {step === 3 && <ConfirmStep />}
+        {step === 1 && <DeliveryStep cartItems={cartItems} delivery={delivery} setDelivery={setDelivery} />}
+        {step === 2 && <PaymentStep cartItems={cartItems} method={method} setMethod={setMethod} mobileNumber={mobileNumber} setMobileNumber={setMobileNumber} delivery={delivery} setDelivery={setDelivery} showValidation={showValidation} />}
+        {step === 3 && <ConfirmStep cartItems={cartItems} />}
       </div>
 
       <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 30 }}>
         {step < 3 ? (
           <button
-            onClick={() => onStepChange((step + 1) as CheckoutStep)}
+            onClick={handlePrimaryAction}
             style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
             {step === 1 ? 'Continue to Payment' : 'Confirm & Pay'}
           </button>
         ) : (
           <button
+            onClick={sendToWhatsApp}
             style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
             Track my order
@@ -460,53 +563,66 @@ function CheckoutPage({ step, onStepChange, onBack }: { step: CheckoutStep; onSt
   )
 }
 
-function DeliveryStep() {
+function DeliveryStep({ cartItems, delivery, setDelivery }: { cartItems: CartItem[]; delivery: DeliveryInfo; setDelivery: Dispatch<SetStateAction<DeliveryInfo>> }) {
   const inputStyle = {
     width: '100%', padding: '13px 15px', borderRadius: 12, border: '1.5px solid #DDD9D3',
     backgroundColor: '#fff', fontSize: 14, color: '#1A1A1A', outline: 'none',
     boxSizing: 'border-box' as const,
   }
+  const update = (field: keyof DeliveryInfo) => (e: ChangeEvent<HTMLInputElement>) =>
+    setDelivery(d => ({ ...d, [field]: e.target.value }))
+
   return (
     <div>
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>Delivery details</h2>
-      <OrderSummary />
+      <OrderSummary items={cartItems} />
       <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
             <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>First name</label>
-            <input style={inputStyle} placeholder="Amara" />
+            <input style={inputStyle} placeholder="Amara" value={delivery.firstName} onChange={update('firstName')} />
           </div>
           <div>
             <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Last name</label>
-            <input style={inputStyle} placeholder="Nakato" />
+            <input style={inputStyle} placeholder="Nakato" value={delivery.lastName} onChange={update('lastName')} />
           </div>
         </div>
         <div>
           <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Phone number</label>
-          <input style={inputStyle} placeholder="07XX XXX XXX" />
+          <input style={inputStyle} placeholder="07XX XXX XXX" value={delivery.phone} onChange={update('phone')} />
         </div>
         <div>
           <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Delivery area</label>
-          <input style={inputStyle} placeholder="e.g. Kampala, Wakiso" />
+          <input style={inputStyle} placeholder="e.g. Kampala, Wakiso" value={delivery.area} onChange={update('area')} />
         </div>
         <div>
           <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Nearest landmark</label>
-          <input style={inputStyle} placeholder="e.g. Next to Garden City mall" />
+          <input style={inputStyle} placeholder="e.g. Next to Garden City mall" value={delivery.landmark} onChange={update('landmark')} />
         </div>
       </div>
     </div>
   )
 }
 
-function PaymentStep() {
-  const [method, setMethod] = useState<PaymentMethod>('mobile_money')
-  const [mobileNumber, setMobileNumber] = useState('')
-
+function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumber, delivery, setDelivery, showValidation }: { cartItems: CartItem[]; method: PaymentMethod; setMethod: Dispatch<SetStateAction<PaymentMethod>>; mobileNumber: string; setMobileNumber: Dispatch<SetStateAction<string>>; delivery: DeliveryInfo; setDelivery: Dispatch<SetStateAction<DeliveryInfo>>; showValidation: boolean }) {
   const methods: { key: PaymentMethod; title: string; subtitle: string }[] = [
     { key: 'mobile_money', title: 'Mobile Money', subtitle: 'MTN and Airtel accepted' },
     { key: 'cash', title: 'Cash on delivery', subtitle: 'Pay when your order arrives' },
     { key: 'card', title: 'Card payment', subtitle: 'Visa and Mastercard' },
   ]
+
+  const fullName = `${delivery.firstName} ${delivery.lastName}`.trim()
+  const nameError = showValidation && fullName === ''
+  const phoneError = showValidation && delivery.phone.trim() === ''
+  const areaError = showValidation && delivery.area.trim() === ''
+
+  const inputStyle = (hasError: boolean) => ({
+    width: '100%', padding: '13px 15px', borderRadius: 12, border: `1.5px solid ${hasError ? '#DC2626' : '#DDD9D3'}`,
+    backgroundColor: '#fff', fontSize: 14, color: '#1A1A1A', outline: 'none',
+    boxSizing: 'border-box' as const,
+  })
+  const labelStyle = { fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' as const }
+  const errorTextStyle = { fontSize: 11, color: '#DC2626', marginTop: 4, display: 'block' as const }
 
   return (
     <div>
@@ -536,6 +652,45 @@ function PaymentStep() {
         })}
       </div>
 
+      <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div>
+          <label style={labelStyle}>Full name *</label>
+          <input
+            required
+            style={inputStyle(nameError)}
+            placeholder="Amara Nakato"
+            value={fullName}
+            onChange={e => {
+              const [firstName = '', ...rest] = e.target.value.split(' ')
+              setDelivery(d => ({ ...d, firstName, lastName: rest.join(' ') }))
+            }}
+          />
+          {nameError && <span style={errorTextStyle}>Please enter your name</span>}
+        </div>
+        <div>
+          <label style={labelStyle}>Phone number *</label>
+          <input
+            required
+            style={inputStyle(phoneError)}
+            placeholder="07XX XXX XXX"
+            value={delivery.phone}
+            onChange={e => setDelivery(d => ({ ...d, phone: e.target.value }))}
+          />
+          {phoneError && <span style={errorTextStyle}>Please enter your phone number</span>}
+        </div>
+        <div>
+          <label style={labelStyle}>Location *</label>
+          <input
+            required
+            style={inputStyle(areaError)}
+            placeholder="e.g. Kampala, Wakiso"
+            value={delivery.area}
+            onChange={e => setDelivery(d => ({ ...d, area: e.target.value }))}
+          />
+          {areaError && <span style={errorTextStyle}>Please enter your location</span>}
+        </div>
+      </div>
+
       {method === 'mobile_money' && (
         <div style={{ marginBottom: 24 }}>
           <label style={{ fontSize: 13, fontWeight: 500, color: '#717171', marginBottom: 8, display: 'block' }}>Mobile Money number</label>
@@ -548,13 +703,15 @@ function PaymentStep() {
         </div>
       )}
 
-      <OrderSummary />
+      <OrderSummary items={cartItems} />
     </div>
   )
 }
 
-function ConfirmStep() {
-  const total = ORDER_ITEMS.reduce((s, i) => s + i.price, 0) + DELIVERY_FEE
+function ConfirmStep({ cartItems }: { cartItems: CartItem[] }) {
+  const subtotal = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0)
+  const hasItems = cartItems.length > 0
+  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
   return (
     <div style={{ textAlign: 'center', paddingTop: 20 }}>
       <div style={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: '#C8E6D4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>
@@ -566,16 +723,18 @@ function ConfirmStep() {
       </p>
       <div style={{ background: '#fff', borderRadius: 18, padding: '20px', textAlign: 'left', marginBottom: 20 }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: '#717171', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Order summary</p>
-        {ORDER_ITEMS.map(item => (
-          <div key={item.name} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-            <span style={{ fontSize: 14, color: '#1A1A1A' }}>{item.name}</span>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{fmt(item.price)}</span>
+        {cartItems.map(item => (
+          <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+            <span style={{ fontSize: 14, color: '#1A1A1A' }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
+            <span style={{ fontSize: 14, fontWeight: 500 }}>{fmt(item.product.price * item.quantity)}</span>
           </div>
         ))}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontSize: 14, color: '#717171' }}>Delivery</span>
-          <span style={{ fontSize: 14 }}>{fmt(DELIVERY_FEE)}</span>
-        </div>
+        {hasItems && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+            <span style={{ fontSize: 14, color: '#717171' }}>Delivery</span>
+            <span style={{ fontSize: 14 }}>{fmt(DELIVERY_FEE)}</span>
+          </div>
+        )}
         <div style={{ borderTop: '1px solid #E8E4DE', paddingTop: 14, display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 15, fontWeight: 700 }}>Total</span>
           <span style={{ fontSize: 18, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
@@ -592,23 +751,29 @@ function ConfirmStep() {
   )
 }
 
-function OrderSummary() {
-  const subtotal = ORDER_ITEMS.reduce((s, i) => s + i.price, 0)
-  const total = subtotal + DELIVERY_FEE
+function OrderSummary({ items }: { items: CartItem[] }) {
+  const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0)
+  const hasItems = items.length > 0
+  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
 
   return (
     <div style={{ backgroundColor: '#E8E4DE', borderRadius: 18, padding: '18px 20px' }}>
       <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', marginBottom: 14 }}>Order summary</p>
-      {ORDER_ITEMS.map(item => (
-        <div key={item.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-          <span style={{ fontSize: 13.5, color: '#1A1A1A', flex: 1, marginRight: 12, lineHeight: 1.4 }}>{item.name}</span>
-          <span style={{ fontSize: 13.5, fontWeight: 600, color: '#1A1A1A', flexShrink: 0 }}>{fmt(item.price)}</span>
+      {!hasItems && (
+        <p style={{ fontSize: 13.5, color: '#717171', marginBottom: 14 }}>Your cart is empty</p>
+      )}
+      {items.map(item => (
+        <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+          <span style={{ fontSize: 13.5, color: '#1A1A1A', flex: 1, marginRight: 12, lineHeight: 1.4 }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: '#1A1A1A', flexShrink: 0 }}>{fmt(item.product.price * item.quantity)}</span>
         </div>
       ))}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-        <span style={{ fontSize: 13.5, color: '#717171' }}>Delivery</span>
-        <span style={{ fontSize: 13.5, color: '#1A1A1A' }}>{fmt(DELIVERY_FEE)}</span>
-      </div>
+      {hasItems && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+          <span style={{ fontSize: 13.5, color: '#717171' }}>Delivery</span>
+          <span style={{ fontSize: 13.5, color: '#1A1A1A' }}>{fmt(DELIVERY_FEE)}</span>
+        </div>
+      )}
       <div style={{ borderTop: '1.5px solid #D0CDC7', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Total</span>
         <span style={{ fontSize: 20, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
