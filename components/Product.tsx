@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Hero from "./Hero";
 import Section from "./Section";
 import Navbar from "./Navbar";
@@ -130,12 +130,12 @@ const LockIcon = () => (
 export default function App() {
   const [page, setPage] = useState<Page>('listing')
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(2)
-  const [cartCount] = useState(2)
+  const [cartCount, setCartCount] = useState(0)
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
       {page === 'listing' && (
-        <ListingPage cartCount={cartCount} onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }} />
+        <ListingPage cartCount={cartCount} setCartCount={setCartCount} onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }} />
       )}
       {page === 'checkout' && (
         <CheckoutPage step={checkoutStep} onStepChange={setCheckoutStep} onBack={() => setPage('listing')} />
@@ -144,12 +144,23 @@ export default function App() {
   )
 }
 
-function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout: () => void }) {
+function ListingPage({ cartCount, setCartCount, onCheckout }: { cartCount: number; setCartCount: Dispatch<SetStateAction<number>>; onCheckout: () => void }) {
   const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
   const [activeCategory, setActiveCategory] = useState<string>('All')
   const [sort, setSort] = useState<SortOption>('popular')
   const [showSortMenu, setShowSortMenu] = useState(false)
-  const [wishlist, setWishlist] = useState<number[]>([3, 7])
+  const [wishlist, setWishlist] = useState<number[]>([])
+
+  const toggleWishlist = (productId: number) => {
+    const isWishlisted = wishlist.includes(productId)
+    setWishlist(w => isWishlisted ? w.filter(x => x !== productId) : [...w, productId])
+    // Selecting (wishlisting) an item adds 1 to the cart count; deselecting deducts 1
+    setCartCount(c => isWishlisted ? Math.max(0, c - 1) : c + 1)
+  }
+
+  const addToCart = () => {
+    setCartCount(count => count + 1)
+  }
 
   const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMens', 'Personal Tech']
 
@@ -266,7 +277,13 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           {sorted.map(product => (
-            <ProductCard key={product.id} product={product} wishlisted={wishlist.includes(product.id)} onToggleWishlist={() => setWishlist(w => w.includes(product.id) ? w.filter(x => x !== product.id) : [...w, product.id])} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              wishlisted={wishlist.includes(product.id)}
+              onToggleWishlist={() => toggleWishlist(product.id)}
+              onAddToCart={addToCart}
+            />
           ))}
         </div>
 
@@ -283,14 +300,14 @@ function ListingPage({ cartCount, onCheckout }: { cartCount: number; onCheckout:
           onClick={onCheckout}
           style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', letterSpacing: '0.01em' }}
         >
-          View cart & checkout (2)
+          View cart & checkout ({cartCount})
         </button>
       </div>
     </div>
   )
 }
 
-function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Product; wishlisted: boolean; onToggleWishlist: () => void }) {
+function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart }: { product: Product; wishlisted: boolean; onToggleWishlist: () => void; onAddToCart: () => void }) {
   const [imgError, setImgError] = useState(false)
 
   return (
@@ -320,7 +337,27 @@ function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Produ
         )}
         <button
           onClick={e => { e.stopPropagation(); onToggleWishlist() }}
-          style={{ position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            width: 34,
+            height: 34,
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255, 255, 255, 0.99)',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 22,
+            fontWeight: 700,
+            lineHeight: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: wishlisted ? '#E11D48' : '#4A4A4A',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+            transition: 'transform 0.15s, color 0.15s',
+            transform: wishlisted ? 'scale(1.05)' : 'scale(1)',
+          }}
         >
           {wishlisted ? '♥' : '♡'}
         </button>
@@ -333,6 +370,12 @@ function ProductCard({ product, wishlisted, onToggleWishlist }: { product: Produ
             <span style={{ fontSize: 11, color: '#9A9590', textDecoration: 'line-through' }}>{fmt(product.originalPrice)}</span>
           )}
         </div>
+        <button
+          onClick={e => { e.stopPropagation(); onAddToCart() }}
+          style={{ width: '100%', marginTop: 10, padding: '9px 8px', border: 'none', borderRadius: 10, backgroundColor: '#16A34A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+        >
+          Add to cart
+        </button>
       </div>
     </div>
   )
