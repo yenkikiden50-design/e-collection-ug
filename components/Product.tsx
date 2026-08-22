@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Dispatch, SetStateAction, ChangeEvent } from "react";
+import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
 import Hero from "./Hero";
 import Section from "./Section";
 import Navbar from "./Navbar";
@@ -8,7 +8,7 @@ import Navbar from "./Navbar";
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Page = 'listing' | 'checkout' | 'detail'
 type CheckoutStep = 1 | 2 | 3
-type NavLine = 'Store' | 'Ladies line' | 'GentleMens' | 'Personal Tech'
+type NavLine = 'Store' | 'Ladies line' | 'GentleMen' | 'Personal Tech'
 type SortOption = 'popular' | 'price_asc' | 'price_desc' | 'newest'
 type PaymentMethod = 'mobile_money' | 'cash' | 'card'
 
@@ -38,17 +38,20 @@ interface DeliveryInfo {
 
 const LADIES_PRODUCTS: Product[] = [
   { id: 1, name: 'Floral wrap dress', price: 68000, originalPrice: 85000, discount: 20, category: 'Dresses', image: 'https://images.unsplash.com/photo-1696962678565-bee84e6b9cb6?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
-  { id: 2, name: 'Linen blouse', price: 45000, category: 'Tops', image: 'https://images.unsplash.com/photo-1608234807905-4466023792f5?w=400&h=520&fit=crop&auto=format' },
+  { id: 2, name: 'Linen blouse', price: 40000, category: 'Tops', image: 'https://images.unsplash.com/photo-1608234807905-4466023792f5?w=400&h=520&fit=crop&auto=format' },
   { id: 3, name: 'Silk midi dress', price: 89000, category: 'Dresses', image: 'https://images.unsplash.com/photo-1709809081557-78f803ce93a0?w=400&h=520&fit=crop&auto=format', tag: 'New' },
   { id: 4, name: 'Cotton crop top', price: 38000, originalPrice: 48000, discount: 21, category: 'Tops', image: 'https://images.unsplash.com/photo-1761117228880-df2425bd70da?w=400&h=520&fit=crop&auto=format' },
   { id: 5, name: 'Strappy sandals', price: 55000, category: 'Footwear', image: 'https://images.unsplash.com/photo-1630386474440-8f2e6d752a98?w=400&h=520&fit=crop&auto=format' },
-  { id: 6, name: 'Leather tote bag', price: 72000, category: 'Bags', image: 'https://images.unsplash.com/photo-1691480250099-a63081ecfcb8?w=400&h=520&fit=crop&auto=format', tag: 'New' },
-  { id: 7, name: 'Wide leg trousers', price: 49000, category: 'Pants', image: 'https://images.unsplash.com/photo-1717454169727-faf491653536?w=400&h=520&fit=crop&auto=format' },
+  { id: 6, name: 'ChrisBella bag', price: 120000, category: 'Bags', image: '/images/ladies/bag3.jpg', tag: 'New' },
+  { id: 7, name: 'Boyfriend Jeans', price: 49000, category: 'Pants', image: '/images/ladies/pants.jpg' },
   { id: 8, name: 'Woven sun hat', price: 22000, originalPrice: 30000, discount: 27, category: 'Caps', image: 'https://images.unsplash.com/photo-1696962701419-6f510910e838?w=400&h=520&fit=crop&auto=format' },
   { id: 9, name: 'Boho maxi dress', price: 95000, category: 'Dresses', image: 'https://images.unsplash.com/photo-1687052093309-7a14efa58ecb?w=400&h=520&fit=crop&auto=format', tag: 'New' },
-  { id: 10, name: 'Plaid shirt', price: 42000, category: 'Tops', image: 'https://images.unsplash.com/photo-1625517527468-a6f1e2b124be?w=400&h=520&fit=crop&auto=format' },
-  { id: 11, name: 'Heeled sandals', price: 65000, originalPrice: 80000, discount: 19, category: 'Footwear', image: 'https://images.unsplash.com/photo-1559766084-38c917374a9a?w=400&h=520&fit=crop&auto=format' },
-  { id: 12, name: 'Rattan basket bag', price: 58000, category: 'Bags', image: 'https://images.unsplash.com/photo-1732963878674-651e7f5f71d7?w=400&h=520&fit=crop&auto=format' },
+  { id: 10, name: 'Checked shirt', price: 25000, category: 'Tops', image: 'https://images.unsplash.com/photo-1625517527468-a6f1e2b124be?w=400&h=520&fit=crop&auto=format' },
+  { id: 11, name: 'Pushin sandals', price: 35000, originalPrice: 50000, discount: 30, category: 'Footwear', image: '/images/ladies/shoes.jpg' },
+  { id: 12, name: 'ChrisBella bag', price: 120000, category: 'Bags', image: '/images/ladies/bag4.jpg' },
+  { id: 13, name: 'Hermes bag', price: 80000, category: 'Bags', image: '/images/ladies/bag2.jpg' },
+  { id: 14, name: 'Louis Vuitton bag', price: 120000, category: 'Bags', image: '/images/ladies/bag1.jpg' },
+  
 ]
 
 const MENS_PRODUCTS: Product[] = [
@@ -62,6 +65,8 @@ const MENS_PRODUCTS: Product[] = [
   { id: 108, name: 'Tailored suit trousers', price: 110000, category: 'Trousers', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=520&fit=crop&auto=format', tag: 'New' },
   { id: 109, name: 'Suede sneakers', price: 78000, category: 'Shoes', image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=400&h=520&fit=crop&auto=format' },
   { id: 110, name: 'Bomber jacket', price: 95000, originalPrice: 120000, discount: 21, category: 'Jackets', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=520&fit=crop&auto=format' },
+  { id: 111, name: 'Home team jersey', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey.jpg', tag: 'New' },
+  { id: 112, name: 'Away team jersey', price: 65000, originalPrice: 78000, discount: 17, category: 'Jerseys', image: 'https://images.unsplash.com/photo-1580087433830-05ff2adc9f8b?w=400&h=520&fit=crop&auto=format' },
 ]
 
 const ELECTRONICS_PRODUCTS: Product[] = [
@@ -82,18 +87,46 @@ const ALL_PRODUCTS: Product[] = [
 ]
 
 const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
-  'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
+  'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
   'Ladies line': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps'],
-  'GentleMens': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Bags', 'Caps'],
+  'GentleMen': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Bags', 'Caps'],
   'Personal Tech': ['All', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
 }
 
 const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
   'Store': ALL_PRODUCTS,
   'Ladies line': LADIES_PRODUCTS,
-  'GentleMens': MENS_PRODUCTS,
+  'GentleMen': MENS_PRODUCTS,
   'Personal Tech': ELECTRONICS_PRODUCTS,
 }
+
+// Flat list used by the Navbar's side menu — each entry jumps straight to a
+// specific nav line + category, without needing to first tap the line's tab.
+interface CategoryMenuItem {
+  label: string
+  line: NavLine
+  category: string
+}
+const CATEGORY_MENU: CategoryMenuItem[] = [
+  { label: 'All products', line: 'Store', category: 'All' },
+  { label: 'Dresses', line: 'Ladies line', category: 'Dresses' },
+  { label: 'Tops', line: 'Ladies line', category: 'Tops' },
+  { label: 'Footwear', line: 'Ladies line', category: 'Footwear' },
+  { label: 'Pants', line: 'Ladies line', category: 'Pants' },
+  { label: 'Bags', line: 'Ladies line', category: 'Bags' },
+  { label: 'Caps', line: 'Ladies line', category: 'Caps' },
+  { label: 'Shirts', line: 'GentleMen', category: 'Shirts' },
+  { label: 'Trousers', line: 'GentleMen', category: 'Trousers' },
+  { label: 'Shoes', line: 'GentleMen', category: 'Shoes' },
+  { label: 'Jackets', line: 'GentleMen', category: 'Jackets' },
+  { label: 'Jerseys', line: 'GentleMen', category: 'Jerseys' },
+  { label: 'Phones', line: 'Personal Tech', category: 'Phones' },
+  { label: 'Laptops', line: 'Personal Tech', category: 'Laptops' },
+  { label: 'Audio', line: 'Personal Tech', category: 'Audio' },
+  { label: 'Wearables', line: 'Personal Tech', category: 'Wearables' },
+  { label: 'Accessories', line: 'Personal Tech', category: 'Accessories' },
+  { label: 'TVs', line: 'Personal Tech', category: 'TVs' },
+]
 
 const DELIVERY_FEE = 5000
 // WhatsApp number in full international format, no leading 0 or +
@@ -230,6 +263,7 @@ export default function App() {
           product={selectedProduct}
           cartItems={cartItems}
           addToCart={addToCart}
+          onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }}
           onBack={() => setPage('listing')}
           onViewProduct={viewProduct}
         />
@@ -261,14 +295,17 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
     }
   }
 
-  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMens', 'Personal Tech']
+  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMen', 'Personal Tech']
 
   const categories = CATEGORIES_BY_LINE[selectedNav]
   const lineProducts = PRODUCTS_BY_LINE[selectedNav]
 
-  useEffect(() => {
-    setActiveCategory('All')
-  }, [selectedNav])
+  // Jumping to a specific category (via the side menu) sets both the line and
+  // category directly, without being reset back to 'All'.
+  const jumpToCategory = (line: NavLine, category: string) => {
+    setSelectedNav(line)
+    setActiveCategory(category)
+  }
 
   const sortLabels: Record<SortOption, string> = {
     popular: 'Sort: popular',
@@ -286,7 +323,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
 
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
-      <Navbar cartCount={cartCount} onCheckout={onCheckout} />
+      <Navbar cartCount={cartCount} onCheckout={onCheckout} categories={CATEGORY_MENU} onSelectCategory={(line, category) => jumpToCategory(line as NavLine, category)} />
 
       {/* CHANGED: spacer reserves space for the now-fixed Navbar (promo bar ~24px + logo row ~57px = ~81px)
           so Hero and page content don't render underneath it */}
@@ -296,7 +333,9 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
         <Hero />
       </div>
 
-      <Section />
+      <div style={{ marginTop: 16 }}>
+        <Section />
+      </div>
 
       <div style={{ padding: '0 20px 100px' }}>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 22, marginBottom: 14, scrollbarWidth: 'none' }}>
@@ -305,9 +344,9 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
             return (
               <button
                 key={item}
-                onClick={() => setSelectedNav(item)}
+                onClick={() => { setSelectedNav(item); setActiveCategory('All') }}
                 style={{
-                  padding: '9px 14px', borderRadius: 24, fontSize: 13, fontWeight: active ? 600 : 500,
+                  padding: '7px 11px', borderRadius: 20, fontSize: 12, fontWeight: active ? 600 : 500,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#16A34A' : '#F5F3EF',
@@ -326,13 +365,13 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
             <p className="text-base font-medium text-slate-400">{lineProducts.length} products</p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontWeight: 400 }}>
+            <button style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 11px', borderRadius: 20, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 12, color: '#1A1A1A', cursor: 'pointer', fontWeight: 400 }}>
               <FilterIcon /> Filter
             </button>
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowSortMenu(v => !v)}
-                style={{ padding: '9px 14px', borderRadius: 24, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 13, color: '#1A1A1A', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}
+                style={{ padding: '7px 11px', borderRadius: 20, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 12, color: '#1A1A1A', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}
               >
                 {sortLabels[sort]}
               </button>
@@ -361,7 +400,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 style={{
-                  padding: '9px 18px', borderRadius: 24, fontSize: 14, fontWeight: active ? 600 : 400,
+                  padding: '7px 11px', borderRadius: 20, fontSize: 12, fontWeight: active ? 600 : 400,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#C8E6D4' : '#E8E4DE',
@@ -395,14 +434,33 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
         )}
       </div>
 
-      <div style={{ position: 'fixed', inset: 'auto 0 0', margin: '0 auto', width: '100%', maxWidth: 480, left: 0, right: 0, bottom: 0, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 999 }}>
-        <button
-          onClick={onCheckout}
-          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', letterSpacing: '0.01em' }}
-        >
-          View cart & checkout ({cartCount})
-        </button>
-      </div>
+      <button
+        onClick={onCheckout}
+        aria-label="View cart and checkout"
+        style={{
+          position: 'fixed', right: 20, bottom: 24, zIndex: 999,
+          width: 58, height: 58, borderRadius: '50%',
+          backgroundColor: '#C4562A', border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 6px 18px rgba(196,86,42,0.45)',
+        }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+        <span style={{
+          position: 'absolute', top: -4, right: -4,
+          width: 22, height: 22, borderRadius: '50%',
+          backgroundColor: '#fff', color: '#C4562A',
+          fontSize: 12, fontWeight: 800,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '2px solid #C4562A',
+        }}>
+          {cartCount}
+        </span>
+      </button>
     </div>
   )
 }
@@ -481,7 +539,7 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
   )
 }
 
-function ProductDetailPage({ product, cartItems, addToCart, onBack, onViewProduct }: { product: Product; cartItems: CartItem[]; addToCart: (product: Product, qty?: number) => void; onBack: () => void; onViewProduct: (product: Product) => void }) {
+function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, onViewProduct }: { product: Product; cartItems: CartItem[]; addToCart: (product: Product, qty?: number) => void; onCheckout: () => void; onBack: () => void; onViewProduct: (product: Product) => void }) {
   const [imgError, setImgError] = useState(false)
   const [selectedSize, setSelectedSize] = useState<string>('M')
   const [qty, setQty] = useState(1)
@@ -505,7 +563,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onBack, onViewProduc
             <BackIcon /> Back
           </button>
           <button
-            onClick={onBack}
+            onClick={onCheckout}
             aria-label="View cart"
             style={{ position: 'relative', border: 'none', background: 'transparent', color: '#1A1A1A', cursor: 'pointer', padding: 0 }}
           >
@@ -666,7 +724,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
   }
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF' }}>
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF' }}>
       <div style={{ backgroundColor: '#F5F3EF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E8E4DE', position: 'sticky', top: 0, zIndex: 30 }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
           <BackIcon /> Back
@@ -717,7 +775,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
         {step === 3 && <ConfirmStep cartItems={cartItems} />}
       </div>
 
-      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 480, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 30 }}>
+      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 420, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 30 }}>
         {step < 3 ? (
           <button
             onClick={handlePrimaryAction}
