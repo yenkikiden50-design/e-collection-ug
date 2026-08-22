@@ -16,9 +16,13 @@ export default function Navbar({ cartCount, onCheckout }: NavbarProps) {
         </p>
 
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3">
-          <span className="text-2xl font-bold tracking-tight text-black">
-            E-Collections<span className="text-[#C4562A]">.ug</span>
-          </span>
+          {/* CHANGED: logo text replaced with an image. Place your logo file at
+              /public/logo.jpg (or update the src below to match your file's path/name). */}
+          <img
+            src="/images/logo.jpg"
+            alt="E-Collections.ug"
+            className="h-12 w-auto object-contain"
+          />
 
           <button
             onClick={onCheckout}
