@@ -248,7 +248,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: "'Poppins', sans-serif" }}>
       {page === 'listing' && (
         <ListingPage
           cartItems={cartItems}
@@ -329,7 +329,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
           so Hero and page content don't render underneath it */}
       <div style={{ height: 81 }} />
 
-      <div style={{ padding: '16px 20px 0' }}>
+      <div style={{ padding: '8px 20px 0' }}>
         <Hero />
       </div>
 
@@ -361,7 +361,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 8, marginBottom: 20 }}>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-0">{selectedNav}</h1>
+            <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-0" style={{ fontFamily: "'Playfair Display', serif" }}>{selectedNav}</h1>
             <p className="text-base font-medium text-slate-400">{lineProducts.length} products</p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -602,7 +602,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
       </div>
 
       <div style={{ padding: '22px 20px 0' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.25, marginBottom: 12 }}>{product.name}</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.25, marginBottom: 12, fontFamily: "'Playfair Display', serif" }}>{product.name}</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: 20, fontWeight: 800, color: '#16A34A' }}>{fmt(product.price)}</span>
           {product.originalPrice && (
@@ -730,7 +730,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
           <BackIcon /> Back
         </button>
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>E-Collections</span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Playfair Display', serif" }}>E-Collections</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#717171', fontSize: 13 }}>
           <LockIcon /> Secure checkout
@@ -807,7 +807,7 @@ function DeliveryStep({ cartItems, delivery, setDelivery }: { cartItems: CartIte
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>Delivery details</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, fontFamily: "'Playfair Display', serif" }}>Delivery details</h2>
       <OrderSummary items={cartItems} />
       <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -859,7 +859,7 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>Payment method</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, fontFamily: "'Playfair Display', serif" }}>Payment method</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
         {methods.map(m => {
           const active = method === m.key
@@ -950,7 +950,7 @@ function ConfirmStep({ cartItems }: { cartItems: CartItem[] }) {
       <div style={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: '#C8E6D4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>
         ✅
       </div>
-      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Order placed!</h2>
+      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, fontFamily: "'Playfair Display', serif" }}>Order placed!</h2>
       <p style={{ fontSize: 14, color: '#717171', marginBottom: 28, lineHeight: 1.6 }}>
         Your order has been received.<br />We will contact you to confirm delivery.
       </p>

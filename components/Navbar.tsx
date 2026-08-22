@@ -27,6 +27,11 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
 
   return (
     <>
+      {/* Google Fonts: Playfair Display (headings) + Poppins (body/UI text) */}
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600;700&display=swap"
+      />
       {/* CHANGED: fixed to the top of the viewport, constrained to the same 420px
           column as the rest of the page, so it stays visible while scrolling on mobile */}
       <div className="fixed left-0 right-0 top-0 z-38 mx-auto w-full max-w-[420px] bg-white">
