@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 
 const slides = [
   { src: '/images/men/shirts/headsets.jpg', alt: "Personal Tech" },
-  { src: '/images/short dress.webp', alt: "Women's dresses" },
-  { src: '/images/men/shirts/african man.jpg', alt: "Men's shirts" },
+  { src: '/images/men/shirts/jersey.jpg', alt: "Men's shirts" },
+  { src: '/images/ladies/shoes.jpg', alt: "Women's shoes" },
  
 ]
 
