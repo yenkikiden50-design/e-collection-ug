@@ -6,7 +6,7 @@ import Section from "./Section";
 import Navbar from "./Navbar";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type Page = 'listing' | 'checkout'
+type Page = 'listing' | 'checkout' | 'detail'
 type CheckoutStep = 1 | 2 | 3
 type NavLine = 'Store' | 'Ladies line' | 'GentleMens' | 'Personal Tech'
 type SortOption = 'popular' | 'price_asc' | 'price_desc' | 'newest'
@@ -188,35 +188,15 @@ export default function App() {
   const [page, setPage] = useState<Page>('listing')
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(2)
   const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
-  return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
-      {page === 'listing' && (
-        <ListingPage cartItems={cartItems} setCartItems={setCartItems} onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }} />
-      )}
-      {page === 'checkout' && (
-        <CheckoutPage step={checkoutStep} onStepChange={setCheckoutStep} onBack={() => setPage('listing')} cartItems={cartItems} />
-      )}
-    </div>
-  )
-}
-
-function ListingPage({ cartItems, setCartItems, onCheckout }: { cartItems: CartItem[]; setCartItems: Dispatch<SetStateAction<CartItem[]>>; onCheckout: () => void }) {
-  const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
-  const [activeCategory, setActiveCategory] = useState<string>('All')
-  const [sort, setSort] = useState<SortOption>('popular')
-  const [showSortMenu, setShowSortMenu] = useState(false)
-  const [wishlist, setWishlist] = useState<number[]>([])
-
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, qty: number = 1) => {
     setCartItems(items => {
       const existing = items.find(i => i.product.id === product.id)
       if (existing) {
-        return items.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
+        return items.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + qty } : i)
       }
-      return [...items, { product, quantity: 1 }]
+      return [...items, { product, quantity: qty }]
     })
   }
 
@@ -228,6 +208,47 @@ function ListingPage({ cartItems, setCartItems, onCheckout }: { cartItems: CartI
       return items.map(i => i.product.id === productId ? { ...i, quantity: i.quantity - 1 } : i)
     })
   }
+
+  const viewProduct = (product: Product) => {
+    setSelectedProduct(product)
+    setPage('detail')
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
+      {page === 'listing' && (
+        <ListingPage
+          cartItems={cartItems}
+          addToCart={addToCart}
+          removeOneFromCart={removeOneFromCart}
+          onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }}
+          onViewProduct={viewProduct}
+        />
+      )}
+      {page === 'detail' && selectedProduct && (
+        <ProductDetailPage
+          product={selectedProduct}
+          cartItems={cartItems}
+          addToCart={addToCart}
+          onBack={() => setPage('listing')}
+          onViewProduct={viewProduct}
+        />
+      )}
+      {page === 'checkout' && (
+        <CheckoutPage step={checkoutStep} onStepChange={setCheckoutStep} onBack={() => setPage('listing')} cartItems={cartItems} />
+      )}
+    </div>
+  )
+}
+
+function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onViewProduct }: { cartItems: CartItem[]; addToCart: (product: Product, qty?: number) => void; removeOneFromCart: (productId: number) => void; onCheckout: () => void; onViewProduct: (product: Product) => void }) {
+  const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
+  const [activeCategory, setActiveCategory] = useState<string>('All')
+  const [sort, setSort] = useState<SortOption>('popular')
+  const [showSortMenu, setShowSortMenu] = useState(false)
+  const [wishlist, setWishlist] = useState<number[]>([])
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   const toggleWishlist = (product: Product) => {
     const isWishlisted = wishlist.includes(product.id)
@@ -361,6 +382,7 @@ function ListingPage({ cartItems, setCartItems, onCheckout }: { cartItems: CartI
               wishlisted={wishlist.includes(product.id)}
               onToggleWishlist={() => toggleWishlist(product)}
               onAddToCart={() => addToCart(product)}
+              onViewProduct={() => onViewProduct(product)}
             />
           ))}
         </div>
@@ -385,11 +407,11 @@ function ListingPage({ cartItems, setCartItems, onCheckout }: { cartItems: CartI
   )
 }
 
-function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart }: { product: Product; wishlisted: boolean; onToggleWishlist: () => void; onAddToCart: () => void }) {
+function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onViewProduct }: { product: Product; wishlisted: boolean; onToggleWishlist: () => void; onAddToCart: () => void; onViewProduct: () => void }) {
   const [imgError, setImgError] = useState(false)
 
   return (
-    <div style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', cursor: 'pointer' }}>
+    <div onClick={onViewProduct} style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', cursor: 'pointer' }}>
       <div style={{ position: 'relative', aspectRatio: '3/4', backgroundColor: '#D8D3CB' }}>
         {!imgError ? (
           <img
@@ -455,6 +477,159 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart }: { p
           Add to cart
         </button>
       </div>
+    </div>
+  )
+}
+
+function ProductDetailPage({ product, cartItems, addToCart, onBack, onViewProduct }: { product: Product; cartItems: CartItem[]; addToCart: (product: Product, qty?: number) => void; onBack: () => void; onViewProduct: (product: Product) => void }) {
+  const [imgError, setImgError] = useState(false)
+  const [selectedSize, setSelectedSize] = useState<string>('M')
+  const [qty, setQty] = useState(1)
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const sizes = ['S', 'M', 'L', 'XL', '2XL']
+
+  // "Customers also bought" — prefer same category, fall back to other products in the same line
+  const related = ALL_PRODUCTS
+    .filter(p => p.id !== product.id && p.category === product.category)
+    .slice(0, 6)
+  const relatedToShow = related.length > 0
+    ? related
+    : ALL_PRODUCTS.filter(p => p.id !== product.id).slice(0, 6)
+
+  return (
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#fff', borderBottom: '1px solid #E8E4DE' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
+            <BackIcon /> Back
+          </button>
+          <button
+            onClick={onBack}
+            aria-label="View cart"
+            style={{ position: 'relative', border: 'none', background: 'transparent', color: '#1A1A1A', cursor: 'pointer', padding: 0 }}
+          >
+            <CartIcon count={cartCount} />
+          </button>
+        </div>
+        <div style={{ padding: '0 20px 12px', fontSize: 12, color: '#9A9590', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+          Home <span style={{ margin: '0 4px' }}>/</span> {product.category} <span style={{ margin: '0 4px' }}>/</span>
+          <span style={{ color: '#C4562A', fontWeight: 500 }}> {product.name}</span>
+        </div>
+      </div>
+
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '4/5', backgroundColor: '#D8D3CB' }}>
+        {!imgError ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            onError={() => setImgError(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A9590', fontSize: 48 }}>
+            👗
+          </div>
+        )}
+        {product.discount && (
+          <div style={{ position: 'absolute', top: 14, left: 14, backgroundColor: '#C4562A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 20 }}>
+            -{product.discount}%
+          </div>
+        )}
+        {product.tag && !product.discount && (
+          <div style={{ position: 'absolute', top: 14, left: 14, backgroundColor: '#1B5E3E', color: '#fff', fontSize: 12, fontWeight: 600, padding: '5px 12px', borderRadius: 20 }}>
+            {product.tag}
+          </div>
+        )}
+      </div>
+
+      <div style={{ padding: '22px 20px 0' }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.25, marginBottom: 12 }}>{product.name}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <span style={{ fontSize: 20, fontWeight: 800, color: '#16A34A' }}>{fmt(product.price)}</span>
+          {product.originalPrice && (
+            <span style={{ fontSize: 14, color: '#9A9590', textDecoration: 'line-through' }}>{fmt(product.originalPrice)}</span>
+          )}
+        </div>
+        <p style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 1.6, marginBottom: 24 }}>
+          {product.name} — {product.category}. Comfortable, everyday quality designed to last.
+        </p>
+
+        <div style={{ marginBottom: 24 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#717171', marginBottom: 10 }}>Size</p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {sizes.map(size => {
+              const active = selectedSize === size
+              return (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  style={{
+                    padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                    border: `1.5px solid ${active ? '#1B5E3E' : '#DDD9D3'}`,
+                    backgroundColor: active ? '#EAF5EE' : '#fff',
+                    color: active ? '#1B5E3E' : '#1A1A1A',
+                  }}
+                >
+                  {size}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 26 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#717171' }}>Quantity</p>
+          <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #DDD9D3', borderRadius: 10, overflow: 'hidden' }}>
+            <button
+              onClick={() => setQty(q => Math.max(1, q - 1))}
+              style={{ width: 34, height: 34, border: 'none', background: '#F5F3EF', fontSize: 16, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+            >
+              −
+            </button>
+            <span style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{qty}</span>
+            <button
+              onClick={() => setQty(q => q + 1)}
+              style={{ width: 34, height: 34, border: 'none', background: '#F5F3EF', fontSize: 16, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={() => addToCart(product, qty)}
+          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', marginBottom: 36 }}
+        >
+          Add to cart
+        </button>
+      </div>
+
+      {relatedToShow.length > 0 && (
+        <div style={{ padding: '0 0 40px' }}>
+          <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: '0 20px 14px' }}>Customers also bought</p>
+          <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none' }}>
+            {relatedToShow.map(p => (
+              <button
+                key={p.id}
+                onClick={() => onViewProduct(p)}
+                style={{ flexShrink: 0, width: 130, textAlign: 'left', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                <div style={{ width: 130, aspectRatio: '3/4', borderRadius: 14, overflow: 'hidden', backgroundColor: '#D8D3CB', marginBottom: 8 }}>
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                </div>
+                <p style={{ fontSize: 12.5, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4 }}>{p.name}</p>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#16A34A' }}>{fmt(p.price)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
