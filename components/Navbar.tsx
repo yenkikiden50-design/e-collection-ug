@@ -17,11 +17,14 @@ export default function Navbar({ cartCount, onCheckout }: NavbarProps) {
 
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3">
           {/* CHANGED: logo text replaced with an image. Place your logo file at
-              /public/logo.jpg (or update the src below to match your file's path/name). */}
+              /public/images/logo.jpg (or update the src below to match your file's path/name).
+              -my-2 lets the image overflow slightly above/below the row without
+              growing the row's own height (padding stays py-3, image reads bigger). */}
           <img
             src="/images/logo.jpg"
             alt="E-Collections.ug"
-            className="h-12 w-auto object-contain"
+            className="h-16 max-w-[70%] object-contain -my-2"
+            style={{ filter: 'contrast(1.12) saturate(1.1)' }}
           />
 
           <button
