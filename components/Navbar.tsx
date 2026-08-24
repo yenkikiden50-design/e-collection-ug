@@ -36,11 +36,13 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
           column as the rest of the page, so it stays visible while scrolling on mobile */}
       <div className="fixed left-0 right-0 top-0 z-38 mx-auto w-full max-w-[420px] bg-white">
         <header className="relative bg-white">
+          {/*
           <p className="flex h-5 items-center justify-center bg-amber-600 px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
             Get free delivery on orders over 300k
           </p>
+          */}
 
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3">
+          <div className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
             <div className="flex items-center gap-3">
               {/* CHANGED: hamburger button opens a side menu of shop-by-category shortcuts */}
               <button
@@ -59,7 +61,7 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
               <img
                 src="/images/logo.jpg"
                 alt="E-Collections.ug"
-                className="h-16 max-w-[55%] object-contain -my-2"
+                className="absolute left-1/2 h-17 max-w-[60%] -translate-x-1/2 object-contain"
                 style={{ filter: 'contrast(1.12) saturate(1.1)' }}
               />
             </div>
