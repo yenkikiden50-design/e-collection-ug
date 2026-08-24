@@ -61,7 +61,7 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
               <img
                 src="/images/logo.jpg"
                 alt="E-Collections.ug"
-                className="absolute left-1/2 h-20 max-w-[70%] -translate-x-1/2 object-contain"
+                className="absolute left-1/2 h-20 max-w-[85%] -translate-x-1/2 object-contain"
                 style={{ filter: 'contrast(1.12) saturate(1.1)' }}
               />
             </div>
