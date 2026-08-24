@@ -34,22 +34,22 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
       />
       {/* CHANGED: fixed to the top of the viewport, constrained to the same 420px
           column as the rest of the page, so it stays visible while scrolling on mobile */}
-      <div className="fixed left-0 right-0 top-0 z-38 mx-auto w-full max-w-[420px] bg-white">
-        <header className="relative bg-white">
+      <div className="fixed left-0 right-0 top-0 z-38 mx-auto w-full max-w-[420px] bg-[#FFFEFA]">
+        <header className="relative bg-[#FFFEFA]">
           {/*
           <p className="flex h-5 items-center justify-center bg-amber-600 px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
             Get free delivery on orders over 300k
           </p>
           */}
 
-          <div className="flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
+          <div className="flex items-center justify-between border-b border-gray-100 bg-[#FFFEFA] px-5 py-5">
             <div className="flex items-center gap-3">
               {/* CHANGED: hamburger button opens a side menu of shop-by-category shortcuts */}
               <button
                 onClick={() => setMenuOpen(true)}
                 aria-label="Open menu"
                 aria-expanded={menuOpen}
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-white text-[#1A1A1A]"
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-white text-[#1A1A1A]"
               >
                 <FontAwesomeIcon icon={faBars} style={{ color: 'rgb(6, 6, 6)' }} />
               </button>
@@ -61,7 +61,7 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
               <img
                 src="/images/logo.jpg"
                 alt="E-Collections.ug"
-                className="absolute left-1/2 h-17 max-w-[60%] -translate-x-1/2 object-contain"
+                className="absolute left-1/2 h-20 max-w-[70%] -translate-x-1/2 object-contain"
                 style={{ filter: 'contrast(1.12) saturate(1.1)' }}
               />
             </div>
