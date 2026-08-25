@@ -13,7 +13,7 @@ export default function Section() {
       style={{
         position: 'fixed',
         right: 20,
-        bottom: 82,
+        bottom: 24,
         zIndex: 999,
         display: 'flex',
         alignItems: 'center',

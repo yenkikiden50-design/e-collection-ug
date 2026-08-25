@@ -388,7 +388,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
         onClick={onCheckout}
         aria-label="View cart and checkout"
         style={{
-          position: 'fixed', right: 20, bottom: 24, zIndex: 999,
+          position: 'fixed', right: 20, bottom: 70, zIndex: 999,
           width: 50, height: 50, borderRadius: '50%',
           backgroundColor: '#cf5e31', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
