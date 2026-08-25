@@ -50,22 +50,52 @@ const LADIES_PRODUCTS: Product[] = [
   { id: 12, name: 'ChrisBella bag', price: 120000, category: 'Bags', image: '/images/ladies/bag4.jpg' },
   { id: 13, name: 'Hermes bag', price: 80000, category: 'Bags', image: '/images/ladies/bag2.jpg' },
   { id: 14, name: 'Louis Vuitton bag', price: 120000, category: 'Bags', image: '/images/ladies/bag1.jpg' },
-  
+  { id: 15, name: 'Pushin sandals', price: 35000, category: 'Footwear', image: '/images/men/shoes/shoe12.jpg' },
+  { id: 16, name: 'Flat sandals', price: 25000, category: 'Footwear', image: '/images/men/shoes/shoe.jpg' },
+
+
 ]
 
 const MENS_PRODUCTS: Product[] = [
-  { id: 101, name: 'Slim fit shirt', price: 52000, category: 'Shirts', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
-  { id: 102, name: 'Chino trousers', price: 60000, originalPrice: 75000, discount: 20, category: 'Trousers', image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=520&fit=crop&auto=format' },
-  { id: 103, name: 'Leather derby shoes', price: 95000, category: 'Shoes', image: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=400&h=520&fit=crop&auto=format', tag: 'New' },
+  { id: 101, name: 'Casual fit shirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt2.jpg', tag: 'Bestseller' },
+  { id: 102, name: 'Casual trousers', price: 60000, originalPrice: 75000, discount: 20, category: 'Trousers', image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=520&fit=crop&auto=format' },
+  { id: 103, name: 'Mens Leather ', price: 280000, category: 'Shoes', image: '/images/men/shoes/shoe8.jpg', tag: 'New' },
   { id: 104, name: 'Denim jacket', price: 88000, category: 'Jackets', image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=520&fit=crop&auto=format' },
   { id: 105, name: 'Canvas backpack', price: 65000, originalPrice: 80000, discount: 19, category: 'Bags', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=520&fit=crop&auto=format' },
   { id: 106, name: 'Classic snapback', price: 28000, category: 'Caps', image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=520&fit=crop&auto=format' },
   { id: 107, name: 'Linen short-sleeve shirt', price: 46000, category: 'Shirts', image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=520&fit=crop&auto=format' },
   { id: 108, name: 'Tailored suit trousers', price: 110000, category: 'Trousers', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=520&fit=crop&auto=format', tag: 'New' },
-  { id: 109, name: 'Suede sneakers', price: 78000, category: 'Shoes', image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=400&h=520&fit=crop&auto=format' },
-  { id: 110, name: 'Bomber jacket', price: 95000, originalPrice: 120000, discount: 21, category: 'Jackets', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=520&fit=crop&auto=format' },
-  { id: 111, name: 'Home team jersey', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey.jpg', tag: 'New' },
-  { id: 112, name: 'Away team jersey', price: 65000, originalPrice: 78000, discount: 17, category: 'Jerseys', image: 'https://images.unsplash.com/photo-1580087433830-05ff2adc9f8b?w=400&h=520&fit=crop&auto=format' },
+  { id: 109, name: 'Suede sneakers', price: 100000, category: 'Shoes', image: '/images/men/shoes/shoe22.jpg' },
+  { id: 110, name: 'Bomber jacket', price: 100000, originalPrice: 120000, discount: 21, category: 'Jackets', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=520&fit=crop&auto=format' },
+  { id: 111, name: 'Manchester City ', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey1.jpg', tag: 'New' },
+  { id: 112, name: 'Manchester United', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey2.jpg', tag: 'New' },
+  { id: 113, name: 'Liverpool', price: 65000, category: 'Jerseys', image: '/images/men/shirts/shirt21.jpg', tag: 'New' },
+  { id: 114, name: 'Leeds United', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey4.jpg', tag: 'New' },
+  { id: 115, name: 'Ipswich Town', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey5.jpg', tag: 'New' },
+  { id: 116, name: 'Brentford', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey6.jpg', tag: 'New' },
+  { id: 117, name: 'Aston Villa', price: 65000, category: 'Jerseys', image: '/images/men/shirts/jersey7.jpg', tag: 'New' },
+  { id: 118, name: 'Chelsea', price: 65000, category: 'Jerseys', image: '/images/men/shirts/Chelsea.jpg', tag: 'New' },
+  { id: 119, name: 'Nottingham Forest', price: 65000, category: 'Jerseys', image: '/images/men/shirts/Nottingham Forest.jpg', tag: 'New' },
+  { id: 120, name: 'Newcastle United', price: 65000, category: 'Jerseys', image: '/images/men/shirts/Newcastle United.jpg', tag: 'New' },
+  { id: 121, name: 'Sweater shirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt4.jpg', tag: 'Bestseller' },
+  { id: 122, name: 'Casual fit shirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt5.jpg', tag: 'Bestseller' },
+  { id: 123, name: 'Polo  shirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt6.jpg',  },
+  { id: 124, name: 'Tshirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt7.jpg',  },
+  { id: 125, name: 'Office shirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt16.jpg',  },
+  { id: 126, name: 'Office shirt', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt9.jpg',  },
+  { id: 127, name: 'Casual Smart', price: 52000, category: 'Shirts', image: '/images/men/shirts/shirt17.jpg',  },
+  { id: 128, name: 'Tie', price: 52000, category: 'Shirts', image: '/images/men/shirts/tie2.jpg',  },
+  { id: 129, name: 'Pants', price: 60000, category: 'Trousers', image: '/images/men/shirts/pant1.jpg',  },
+  { id: 130, name: 'Pants', price: 60000, category: 'Trousers', image: '/images/men/shirts/pant2.jpg',  },
+  { id: 131, name: 'Shorts', price: 25000, category: 'Trousers', image: '/images/men/shirts/short.jpg',  },
+  { id: 132, name: 'White sneakers', price: 130000, category: 'Shoes', image: '/images/men/shoes/shoe21.jpg' },
+  { id: 133, name: 'Suede sneakers', price: 100000, category: 'Shoes', image: '/images/men/shoes/shoe18.jpg' },
+  { id: 134, name: 'Suede sneakers', price: 100000, category: 'Shoes', image: '/images/men/shoes/shoe16.jpg' },
+  { id: 135, name: 'White sneakers', price: 120000, category: 'Shoes', image: '/images/men/shoes/shoe15.jpg' },
+  { id: 136, name: 'Mens Leather', price: 280000, category: 'Shoes', image: '/images/men/shoes/shoe9.jpg' },
+  { id: 137, name: 'Timberland boots', price: 150000, category: 'Shoes', image: '/images/men/shoes/shoe5.jpg' },
+  { id: 138, name: 'Mens leather ', price: 280000, category: 'Trousers', image: '/images/men/shoes/shoe13.jpg',  },
+
 ]
 
 const ELECTRONICS_PRODUCTS: Product[] = [
@@ -439,7 +469,7 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
         )}
 
         {product.discount && (
-          <div className="absolute top-1.5 left-1.5 bg-[#C4562A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+          <div className="absolute top-1.5 left-1.5 bg-[#C4562A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
             -{product.discount}%
           </div>
         )}
@@ -463,9 +493,9 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
           {product.name}
         </p>
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-[12px] font-medium text-[#16A34A]">{fmt(product.price)}</span>
+          <span className="text-[12px] font-medium text-[#16A34A]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.price)}</span>
           {product.originalPrice && (
-            <span className="text-[9px] text-[#9A9590] line-through">{fmt(product.originalPrice)}</span>
+            <span className="text-[9px] text-[#9A9590] line-through" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.originalPrice)}</span>
           )}
         </div>
         <button
@@ -496,7 +526,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
     : ALL_PRODUCTS.filter(p => p.id !== product.id).slice(0, 6)
 
   return (
-    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative' }}>
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', fontFamily: "'Playfair Display', Georgia, serif" }}>
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#fff', borderBottom: '1px solid #E8E4DE' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
@@ -530,7 +560,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
           </div>
         )}
         {product.discount && (
-          <div style={{ position: 'absolute', top: 14, left: 14, backgroundColor: '#C4562A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 20 }}>
+          <div style={{ position: 'absolute', top: 14, left: 14, backgroundColor: '#C4562A', color: '#fff', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 20, fontFamily: "'Playfair Display', Georgia, serif" }}>
             -{product.discount}%
           </div>
         )}
@@ -664,7 +694,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF' }}>
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF', fontFamily: "'Playfair Display', Georgia, serif" }}>
       <div style={{ backgroundColor: '#F5F3EF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E8E4DE', position: 'sticky', top: 0, zIndex: 30 }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
           <BackIcon /> Back
@@ -680,7 +710,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
       <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
         <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 64, zIndex: 25 }}>
           <span style={{ fontSize: 18 }}>🚚</span>
-          <span style={{ fontSize: 14 }}>Free delivery on checkout orders</span>
+          <span style={{ fontSize: 14 }}>Get free delivery on orders over 300k</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {steps.map((s, i) => {
