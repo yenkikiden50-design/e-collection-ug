@@ -9,7 +9,6 @@ import Navbar from "./Navbar";
 type Page = 'listing' | 'checkout' | 'detail'
 type CheckoutStep = 1 | 2 | 3
 type NavLine = 'Store' | 'Ladies line' | 'GentleMen' | 'Personal Tech'
-type SortOption = 'popular' | 'price_asc' | 'price_desc' | 'newest'
 type PaymentMethod = 'mobile_money' | 'cash' | 'card'
 
 interface Product {
@@ -72,11 +71,9 @@ const MENS_PRODUCTS: Product[] = [
 const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 201, name: 'Wireless ear buds', price: 60000, category: 'Audio', image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=520&fit=crop&auto=format', tag: 'Bestseller' },
   { id: 202, name: 'Smartphone 128GB', price: 850000, originalPrice: 950000, discount: 11, category: 'Phones', image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=520&fit=crop&auto=format' },
-  { id: 203, name: '13-inch laptop', price: 2400000, category: 'Laptops', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=520&fit=crop&auto=format', tag: 'New' },
   { id: 204, name: 'Smartwatch', price: 220000, originalPrice: 280000, discount: 21, category: 'Wearables', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=520&fit=crop&auto=format' },
   { id: 205, name: 'Bluetooth speaker', price: 95000, category: 'Audio', image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=520&fit=crop&auto=format' },
   { id: 206, name: 'Fast charger 65W', price: 45000, category: 'Accessories', image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&h=520&fit=crop&auto=format' },
-  { id: 207, name: '32-inch smart TV', price: 950000, originalPrice: 1100000, discount: 14, category: 'TVs', image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=520&fit=crop&auto=format', tag: 'New' },
   { id: 208, name: 'Power bank 20000mAh', price: 55000, category: 'Accessories', image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=520&fit=crop&auto=format' },
 ]
 
@@ -87,10 +84,10 @@ const ALL_PRODUCTS: Product[] = [
 ]
 
 const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
-  'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
+  'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Phones', 'Audio', 'Wearables', 'Accessories'],
   'Ladies line': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps'],
   'GentleMen': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Bags', 'Caps'],
-  'Personal Tech': ['All', 'Phones', 'Laptops', 'Audio', 'Wearables', 'Accessories', 'TVs'],
+  'Personal Tech': ['All', 'Phones', 'Audio', 'Wearables', 'Accessories'],
 }
 
 const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
@@ -121,11 +118,9 @@ const CATEGORY_MENU: CategoryMenuItem[] = [
   { label: 'Jackets', line: 'GentleMen', category: 'Jackets' },
   { label: 'Jerseys', line: 'GentleMen', category: 'Jerseys' },
   { label: 'Phones', line: 'Personal Tech', category: 'Phones' },
-  { label: 'Laptops', line: 'Personal Tech', category: 'Laptops' },
   { label: 'Audio', line: 'Personal Tech', category: 'Audio' },
   { label: 'Wearables', line: 'Personal Tech', category: 'Wearables' },
   { label: 'Accessories', line: 'Personal Tech', category: 'Accessories' },
-  { label: 'TVs', line: 'Personal Tech', category: 'TVs' },
 ]
 
 const DELIVERY_FEE = 5000
@@ -278,8 +273,6 @@ export default function App() {
 function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onViewProduct }: { cartItems: CartItem[]; addToCart: (product: Product, qty?: number) => void; removeOneFromCart: (productId: number) => void; onCheckout: () => void; onViewProduct: (product: Product) => void }) {
   const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
   const [activeCategory, setActiveCategory] = useState<string>('All')
-  const [sort, setSort] = useState<SortOption>('popular')
-  const [showSortMenu, setShowSortMenu] = useState(false)
   const [wishlist, setWishlist] = useState<number[]>([])
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
@@ -307,19 +300,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
     setActiveCategory(category)
   }
 
-  const sortLabels: Record<SortOption, string> = {
-    popular: 'Sort: popular',
-    price_asc: 'Price: low–high',
-    price_desc: 'Price: high–low',
-    newest: 'Newest first',
-  }
-
   const visible = lineProducts.filter(p => activeCategory === 'All' || p.category === activeCategory)
-  const sorted = [...visible].sort((a, b) => {
-    if (sort === 'price_asc') return a.price - b.price
-    if (sort === 'price_desc') return b.price - a.price
-    return 0
-  })
 
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
@@ -346,51 +327,18 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
                 key={item}
                 onClick={() => { setSelectedNav(item); setActiveCategory('All') }}
                 style={{
-                  padding: '7px 11px', borderRadius: 20, fontSize: 12, fontWeight: active ? 600 : 500,
+                  padding: '7px 11px', borderRadius: 20, fontSize: 12, fontWeight: active ? 700 : 600,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#16A34A' : '#F5F3EF',
                   color: active ? '#FFFFFF' : '#4A4A4A',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Playfair Display', Georgia, serif",
                 }}
               >
                 {item}
               </button>
             )
           })}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 8, marginBottom: 20 }}>
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-gray-900 mb-0" style={{ fontFamily: "'Playfair Display', serif" }}>{selectedNav}</h1>
-            <p className="text-base font-medium text-slate-400">{lineProducts.length} products</p>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 11px', borderRadius: 20, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 12, color: '#1A1A1A', cursor: 'pointer', fontWeight: 400 }}>
-              <FilterIcon /> Filter
-            </button>
-            <div style={{ position: 'relative' }}>
-              <button
-                onClick={() => setShowSortMenu(v => !v)}
-                style={{ padding: '7px 11px', borderRadius: 20, border: '1.5px solid #DDD9D3', backgroundColor: '#fff', fontSize: 12, color: '#1A1A1A', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}
-              >
-                {sortLabels[sort]}
-              </button>
-              {showSortMenu && (
-                <div style={{ position: 'absolute', top: '110%', right: 0, backgroundColor: '#F5F3EF', border: '1.5px solid #E8E4DE', borderRadius: 14, padding: '8px 0', zIndex: 20, minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.10)' }}>
-                  {(Object.entries(sortLabels) as [SortOption, string][]).map(([key, label]) => (
-                    <button
-                      key={key}
-                      onClick={() => { setSort(key); setShowSortMenu(false) }}
-                      style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px', background: 'none', border: 'none', fontSize: 13, color: sort === key ? '#1B5E3E' : '#1A1A1A', fontWeight: sort === key ? 600 : 400, cursor: 'pointer' }}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 22, scrollbarWidth: 'none' }}>
@@ -406,6 +354,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#C8E6D4' : '#E8E4DE',
                   color: active ? '#1B5E3E' : '#4A4A4A',
+                  fontFamily: "'Playfair Display', Georgia, serif",
                 }}
               >
                 {cat}
@@ -415,7 +364,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
-          {sorted.map(product => (
+          {visible.map(product => (
             <ProductCard
               key={product.id}
               product={product}
@@ -427,7 +376,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
           ))}
         </div>
 
-        {sorted.length === 0 && (
+        {visible.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#717171' }}>
             <div style={{ fontSize: 40, marginBottom: 10 }}>🛍</div>
             <p style={{ fontSize: 16 }}>No items in this category yet</p>
@@ -440,13 +389,13 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
         aria-label="View cart and checkout"
         style={{
           position: 'fixed', right: 20, bottom: 24, zIndex: 999,
-          width: 58, height: 58, borderRadius: '50%',
-          backgroundColor: '#C4562A', border: 'none', cursor: 'pointer',
+          width: 50, height: 50, borderRadius: '50%',
+          backgroundColor: '#cf5e31', border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 6px 18px rgba(196,86,42,0.45)',
         }}
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
           <line x1="3" y1="6" x2="21" y2="6" />
           <path d="M16 10a4 4 0 0 1-8 0" />
@@ -648,7 +597,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
 
         <button
           onClick={() => addToCart(product, qty)}
-          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', marginBottom: 36 }}
+          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 36, fontFamily: "'Playfair Display', Georgia, serif" }}
         >
           Add to cart
         </button>
