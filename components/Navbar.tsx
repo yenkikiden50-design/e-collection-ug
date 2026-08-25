@@ -138,6 +138,7 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
                   key={`${item.line}-${item.category}-${i}`}
                   onClick={() => handleSelect(item)}
                   className="flex w-full items-center px-5 py-3 text-left text-[15px] font-medium text-[#1A1A1A] hover:bg-gray-50"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
                 >
                   {item.label}
                 </button>

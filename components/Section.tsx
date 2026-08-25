@@ -22,7 +22,7 @@ export default function Section() {
         borderRadius: 999,
         background: '#16A34A',
         boxShadow: '0 6px 18px rgba(22,163,74,0.45)',
-        fontFamily: "'Poppins', sans-serif",
+        fontFamily: "'Playfair Display', Georgia, serif",
       }}
     >
       <span style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

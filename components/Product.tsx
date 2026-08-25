@@ -351,6 +351,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#16A34A' : '#F5F3EF',
                   color: active ? '#FFFFFF' : '#4A4A4A',
+                  fontFamily: "'Poppins', sans-serif",
                 }}
               >
                 {item}
@@ -413,7 +414,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
           })}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className="grid grid-cols-2 gap-2.5">
           {sorted.map(product => (
             <ProductCard
               key={product.id}
@@ -469,68 +470,58 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
   const [imgError, setImgError] = useState(false)
 
   return (
-    <div onClick={onViewProduct} style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', cursor: 'pointer' }}>
-      <div style={{ position: 'relative', aspectRatio: '3/4', backgroundColor: '#D8D3CB' }}>
+    <div
+      onClick={onViewProduct}
+      className="bg-white rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+    >
+      {/* Image container: fixed aspect ratio, image clipped/fitted inside with rounded top corners */}
+      <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-[#D8D3CB]">
         {!imgError ? (
           <img
             src={product.image}
             alt={product.name}
             onError={() => setImgError(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A9590', fontSize: 32 }}>
+          <div className="w-full h-full flex items-center justify-center text-[#9A9590] text-2xl">
             👗
           </div>
         )}
+
         {product.discount && (
-          <div style={{ position: 'absolute', top: 10, left: 10, backgroundColor: '#C4562A', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 20 }}>
+          <div className="absolute top-1.5 left-1.5 bg-[#C4562A] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
             -{product.discount}%
           </div>
         )}
         {product.tag && !product.discount && (
-          <div style={{ position: 'absolute', top: 10, left: 10, backgroundColor: '#1B5E3E', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20 }}>
+          <div className="absolute top-1.5 left-1.5 bg-[#1B5E3E] text-white text-[9px] font-semibold px-1.5 py-0.5 rounded-full">
             {product.tag}
           </div>
         )}
+
         <button
           onClick={e => { e.stopPropagation(); onToggleWishlist() }}
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            width: 34,
-            height: 34,
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.99)',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 22,
-            fontWeight: 700,
-            lineHeight: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: wishlisted ? '#E11D48' : '#4A4A4A',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-            transition: 'transform 0.15s, color 0.15s',
-            transform: wishlisted ? 'scale(1.05)' : 'scale(1)',
-          }}
+          className={`absolute top-1.5 right-1.5 w-[26px] h-[26px] rounded-full bg-white/95 border-none cursor-pointer text-base font-bold leading-none flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition-transform duration-150 ${wishlisted ? 'scale-105 text-[#fd0606]' : 'scale-100 text-[#fe4a03]'}`}
         >
           {wishlisted ? '♥' : '♡'}
         </button>
       </div>
-      <div style={{ padding: '11px 12px 14px' }}>
-        <p style={{ fontSize: 13.5, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 5 }}>{product.name}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#16A34A' }}>{fmt(product.price)}</span>
+
+      {/* Card body */}
+      <div className="px-2 pt-1 pb-1.5">
+        <p className="text-[11.5px] font-normal text-[#1A1A1A] leading-tight mb-0.5 line-clamp-1">
+          {product.name}
+        </p>
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className="text-[12px] font-medium text-[#16A34A]">{fmt(product.price)}</span>
           {product.originalPrice && (
-            <span style={{ fontSize: 11, color: '#9A9590', textDecoration: 'line-through' }}>{fmt(product.originalPrice)}</span>
+            <span className="text-[9px] text-[#9A9590] line-through">{fmt(product.originalPrice)}</span>
           )}
         </div>
         <button
           onClick={e => { e.stopPropagation(); onAddToCart() }}
-          style={{ width: '100%', marginTop: 10, padding: '9px 8px', border: 'none', borderRadius: 10, backgroundColor: '#16A34A', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+          className="w-full mt-1 py-1 px-2 border-none rounded-lg bg-[#16A34A] text-white text-[9.5px] font-medium cursor-pointer hover:bg-[#128a3e] transition-colors"
         >
           Add to cart
         </button>
