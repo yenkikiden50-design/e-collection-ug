@@ -1122,11 +1122,11 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems, onRemoveFromCart,
         </div>
       </div>
 
-      <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
+      <div style={{ padding: '8px 24px 0', backgroundColor: '#F5F3EF' }}>
         {step === 2 && (
-        <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 64, zIndex: 25 }}>
-          <span style={{ fontSize: 18 }}>🚚</span>
-          <span style={{ fontSize: 16 }}>Get free delivery on orders over 300k</span>
+        <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 12, padding: '8px 14px', margin: '0 0 18px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, position: 'sticky', top: 64, zIndex: 25 }}>
+          {/* <span style={{ fontSize: 18 }}>🚚</span> */}
+          <span style={{ fontSize: 13 }}>Get free delivery on orders over 300k</span>
         </div>
         )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
