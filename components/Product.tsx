@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, Dispatch, SetStateAction, ChangeEvent } from "react";
+import { useState, useEffect, Dispatch, SetStateAction, ChangeEvent } from "react";
 import Hero from "./Hero";
 import Section from "./Section";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type Page = 'listing' | 'checkout' | 'detail'
-type CheckoutStep = 1 | 2 | 3
-type NavLine = 'Store' | 'Ladies line' | 'GentleMen' | 'Personal Tech'
-type PaymentMethod = 'mobile_money' | 'cash' | 'card'
+type Page = 'listing' | 'checkout' | 'detail' | 'wishlist' | 'cart'
+type CheckoutStep = 1 | 2
+type NavLine = 'Store' | 'Ladies line' | 'GentleMen' | 'Personal Tech' | 'Beddings'
+type PaymentMethod = 'mobile_money' | 'cash'
 
 interface Product {
   id: number
@@ -24,6 +25,12 @@ interface Product {
 
 interface CartItem {
   product: Product
+  quantity: number
+}
+
+interface WishlistItem {
+  product: Product
+  size: string
   quantity: number
 }
 
@@ -107,6 +114,10 @@ const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 208, name: 'Power bank 20000mAh', price: 55000, category: 'Accessories', image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=520&fit=crop&auto=format' },
 ]
 
+// TODO: add products here once available — the pill will show an empty state until then.
+const BEDDINGS_PRODUCTS: Product[] = [
+]
+
 const ALL_PRODUCTS: Product[] = [
   ...LADIES_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
   ...MENS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
@@ -118,6 +129,7 @@ const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
   'Ladies line': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps'],
   'GentleMen': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Bags', 'Caps'],
   'Personal Tech': ['All', 'Phones', 'Audio', 'Wearables', 'Accessories'],
+  'Beddings': ['All'],
 }
 
 const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
@@ -125,6 +137,7 @@ const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
   'Ladies line': LADIES_PRODUCTS,
   'GentleMen': MENS_PRODUCTS,
   'Personal Tech': ELECTRONICS_PRODUCTS,
+  'Beddings': BEDDINGS_PRODUCTS,
 }
 
 // Flat list used by the Navbar's side menu — each entry jumps straight to a
@@ -151,6 +164,7 @@ const CATEGORY_MENU: CategoryMenuItem[] = [
   { label: 'Audio', line: 'Personal Tech', category: 'Audio' },
   { label: 'Wearables', line: 'Personal Tech', category: 'Wearables' },
   { label: 'Accessories', line: 'Personal Tech', category: 'Accessories' },
+  { label: 'Beddings', line: 'Beddings', category: 'All' },
 ]
 
 const DELIVERY_FEE = 5000
@@ -159,6 +173,21 @@ const WHATSAPP_NUMBER = '256746240983'
 
 function fmt(n: number) {
   return `UGX ${n.toLocaleString()}`
+}
+
+// Shared across the product detail page and the wishlist so size options stay consistent.
+function getSizesForCategory(category: string): string[] {
+  if (category === 'Shoes') return Array.from({ length: 9 }, (_, i) => String(37 + i)) // 37–45
+  if (category === 'Footwear') return Array.from({ length: 6 }, (_, i) => String(37 + i)) // 37–42
+  if (category === 'Bags') return []
+  return ['S', 'M', 'L', 'XL', '2XL']
+}
+
+// Cart items don't otherwise track size, so bake the chosen size into the
+// display name — it still shows up correctly in the order summary and the
+// WhatsApp order message.
+function withSizeLabel(product: Product, size: string): Product {
+  return size ? { ...product, name: `${product.name} (Size ${size})` } : product
 }
 
 function buildWhatsAppMessage(cartItems: CartItem[], delivery: DeliveryInfo, method: PaymentMethod, mobileNumber: string) {
@@ -199,9 +228,7 @@ function buildWhatsAppMessage(cartItems: CartItem[], delivery: DeliveryInfo, met
 
   const methodLabel = method === 'mobile_money'
     ? (mobileNumber ? `Mobile Money (${mobileNumber})` : 'Mobile Money')
-    : method === 'cash'
-    ? 'Cash on delivery'
-    : 'Card payment'
+    : 'Cash on delivery'
   lines.push(`*Payment:* ${methodLabel}`)
 
   return lines.join('\n')
@@ -218,6 +245,18 @@ const CartIcon = ({ count }: { count: number }) => (
       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
       <line x1="3" y1="6" x2="21" y2="6" />
       <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+    {count > 0 && (
+      <span style={{ position: 'absolute', top: -6, right: -6, background: '#C4562A', color: '#fff', fontSize: 10, fontWeight: 700, width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {count}
+      </span>
+    )}
+  </div>
+)
+const HeartIcon = ({ count }: { count: number }) => (
+  <div style={{ position: 'relative' }}>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
     </svg>
     {count > 0 && (
       <span style={{ position: 'absolute', top: -6, right: -6, background: '#C4562A', color: '#fff', fontSize: 10, fontWeight: 700, width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -246,6 +285,7 @@ export default function App() {
   const [page, setPage] = useState<Page>('listing')
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>(2)
   const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const addToCart = (product: Product, qty: number = 1) => {
@@ -258,13 +298,49 @@ export default function App() {
     })
   }
 
-  const removeOneFromCart = (productId: number) => {
-    setCartItems(items => {
-      const existing = items.find(i => i.product.id === productId)
-      if (!existing) return items
-      if (existing.quantity <= 1) return items.filter(i => i.product.id !== productId)
-      return items.map(i => i.product.id === productId ? { ...i, quantity: i.quantity - 1 } : i)
+  const removeFromCart = (productId: number) => {
+    setCartItems(items => items.filter(i => i.product.id !== productId))
+  }
+
+  const updateCartQuantity = (productId: number, delta: number) => {
+    setCartItems(items => items
+      .map(i => i.product.id === productId ? { ...i, quantity: i.quantity + delta } : i)
+      .filter(i => i.quantity > 0)
+    )
+  }
+
+  // Tapping the wishlist heart no longer adds to cart — it just collects the
+  // item (with a default size and quantity) for review on the wishlist page.
+  const toggleWishlist = (product: Product) => {
+    setWishlistItems(items => {
+      const exists = items.some(i => i.product.id === product.id)
+      if (exists) return items.filter(i => i.product.id !== product.id)
+      const sizes = getSizesForCategory(product.category)
+      return [...items, { product, size: sizes[0] ?? '', quantity: 1 }]
     })
+  }
+
+  const removeFromWishlist = (productId: number) => {
+    setWishlistItems(items => items.filter(i => i.product.id !== productId))
+  }
+
+  const setWishlistItemSize = (productId: number, size: string) => {
+    setWishlistItems(items => items.map(i => i.product.id === productId ? { ...i, size } : i))
+  }
+
+  const setWishlistItemQuantity = (productId: number, delta: number) => {
+    setWishlistItems(items => items.map(i => i.product.id === productId ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i))
+  }
+
+  const moveWishlistItemToCart = (productId: number) => {
+    const item = wishlistItems.find(i => i.product.id === productId)
+    if (item) addToCart(withSizeLabel(item.product, item.size), item.quantity)
+    removeFromWishlist(productId)
+  }
+
+  const moveAllWishlistToCart = () => {
+    wishlistItems.forEach(item => addToCart(withSizeLabel(item.product, item.size), item.quantity))
+    setWishlistItems([])
   }
 
   const viewProduct = (product: Product) => {
@@ -275,50 +351,93 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: "'Poppins', sans-serif" }}>
       {page === 'listing' && (
-        <ListingPage
-          cartItems={cartItems}
-          addToCart={addToCart}
-          removeOneFromCart={removeOneFromCart}
-          onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }}
-          onViewProduct={viewProduct}
-        />
+        <>
+          <ListingPage
+            cartItems={cartItems}
+            wishlistItems={wishlistItems}
+            addToCart={addToCart}
+            onToggleWishlist={toggleWishlist}
+            onCheckout={() => setPage('cart')}
+            onViewProduct={viewProduct}
+            onViewWishlist={() => setPage('wishlist')}
+          />
+          <Footer />
+        </>
       )}
       {page === 'detail' && selectedProduct && (
         <ProductDetailPage
           product={selectedProduct}
           cartItems={cartItems}
           addToCart={addToCart}
-          onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }}
+          onCheckout={() => setPage('cart')}
           onBack={() => setPage('listing')}
           onViewProduct={viewProduct}
         />
       )}
+      {page === 'wishlist' && (
+        <WishlistPage
+          wishlistItems={wishlistItems}
+          onBack={() => setPage('listing')}
+          onRemove={removeFromWishlist}
+          onSetSize={setWishlistItemSize}
+          onSetQuantity={setWishlistItemQuantity}
+          onMoveToCart={moveWishlistItemToCart}
+          onMoveAllToCart={() => { moveAllWishlistToCart(); setPage('cart') }}
+        />
+      )}
+      {page === 'cart' && (
+        <CartPage
+          cartItems={cartItems}
+          onBack={() => setPage('listing')}
+          onRemove={removeFromCart}
+          onSetQuantity={updateCartQuantity}
+          onCheckout={() => { setPage('checkout'); setCheckoutStep(2) }}
+        />
+      )}
       {page === 'checkout' && (
-        <CheckoutPage step={checkoutStep} onStepChange={setCheckoutStep} onBack={() => setPage('listing')} cartItems={cartItems} />
+        <CheckoutPage
+          step={checkoutStep}
+          onStepChange={setCheckoutStep}
+          onBack={() => setPage('listing')}
+          cartItems={cartItems}
+          onRemoveFromCart={removeFromCart}
+          onUpdateCartQuantity={updateCartQuantity}
+        />
       )}
     </div>
   )
 }
 
-function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onViewProduct }: { cartItems: CartItem[]; addToCart: (product: Product, qty?: number) => void; removeOneFromCart: (productId: number) => void; onCheckout: () => void; onViewProduct: (product: Product) => void }) {
+function ListingPage({ cartItems, wishlistItems, addToCart, onToggleWishlist, onCheckout, onViewProduct, onViewWishlist }: { cartItems: CartItem[]; wishlistItems: WishlistItem[]; addToCart: (product: Product, qty?: number) => void; onToggleWishlist: (product: Product) => void; onCheckout: () => void; onViewProduct: (product: Product) => void; onViewWishlist: () => void }) {
   const [selectedNav, setSelectedNav] = useState<NavLine>('Store')
   const [activeCategory, setActiveCategory] = useState<string>('All')
-  const [wishlist, setWishlist] = useState<number[]>([])
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const wishlistCount = wishlistItems.length
 
-  const toggleWishlist = (product: Product) => {
-    const isWishlisted = wishlist.includes(product.id)
-    setWishlist(w => isWishlisted ? w.filter(x => x !== product.id) : [...w, product.id])
-    // Selecting (wishlisting) an item adds it to the cart; deselecting removes one unit
-    if (isWishlisted) {
-      removeOneFromCart(product.id)
-    } else {
+  // Products that come in sizes open a quick size-picker sheet instead of
+  // adding straight to the cart with no size chosen.
+  const [sizeSheetProduct, setSizeSheetProduct] = useState<Product | null>(null)
+  const [sheetJustAdded, setSheetJustAdded] = useState(false)
+
+  const handleAddToCart = (product: Product) => {
+    const sizes = getSizesForCategory(product.category)
+    if (sizes.length === 0) {
       addToCart(product)
+    } else {
+      setSizeSheetProduct(product)
+      setSheetJustAdded(false)
     }
   }
 
-  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMen', 'Personal Tech']
+  const confirmSheetSize = (size: string) => {
+    if (!sizeSheetProduct) return
+    addToCart(withSizeLabel(sizeSheetProduct, size))
+    setSheetJustAdded(true)
+    window.setTimeout(() => setSizeSheetProduct(null), 500)
+  }
+
+  const navItems: NavLine[] = ['Store', 'Ladies line', 'GentleMen', 'Personal Tech', 'Beddings']
 
   const categories = CATEGORIES_BY_LINE[selectedNav]
   const lineProducts = PRODUCTS_BY_LINE[selectedNav]
@@ -334,7 +453,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
 
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', overflowX: 'hidden' }}>
-      <Navbar cartCount={cartCount} onCheckout={onCheckout} categories={CATEGORY_MENU} onSelectCategory={(line, category) => jumpToCategory(line as NavLine, category)} />
+      <Navbar cartCount={cartCount} onCheckout={onCheckout} wishlistCount={wishlistCount} onWishlist={onViewWishlist} categories={CATEGORY_MENU} onSelectCategory={(line, category) => jumpToCategory(line as NavLine, category)} />
 
       {/* CHANGED: spacer reserves space for the now-fixed Navbar (promo bar ~24px + logo row ~57px = ~81px)
           so Hero and page content don't render underneath it */}
@@ -348,7 +467,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
         <Section />
       </div>
 
-      <div style={{ padding: '0 20px 100px' }}>
+      <div style={{ padding: '0 20px 12px' }}>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 22, marginBottom: 14, scrollbarWidth: 'none' }}>
           {navItems.map(item => {
             const active = selectedNav === item
@@ -398,9 +517,9 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
             <ProductCard
               key={product.id}
               product={product}
-              wishlisted={wishlist.includes(product.id)}
-              onToggleWishlist={() => toggleWishlist(product)}
-              onAddToCart={() => addToCart(product)}
+              wishlisted={wishlistItems.some(i => i.product.id === product.id)}
+              onToggleWishlist={() => onToggleWishlist(product)}
+              onAddToCart={() => handleAddToCart(product)}
               onViewProduct={() => onViewProduct(product)}
             />
           ))}
@@ -441,6 +560,280 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
           {cartCount}
         </span>
       </button>
+
+      {sizeSheetProduct && (
+        <SizePickerSheet
+          product={sizeSheetProduct}
+          justAdded={sheetJustAdded}
+          onClose={() => setSizeSheetProduct(null)}
+          onConfirm={confirmSheetSize}
+        />
+      )}
+    </div>
+  )
+}
+
+function SizePickerSheet({ product, justAdded, onClose, onConfirm }: { product: Product; justAdded: boolean; onClose: () => void; onConfirm: (size: string) => void }) {
+  const sizes = getSizesForCategory(product.category)
+  const [selectedSize, setSelectedSize] = useState<string>(sizes[0] ?? '')
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div
+        onClick={onClose}
+        style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}
+      />
+      <div
+        style={{
+          position: 'relative', width: '100%', maxWidth: 420, backgroundColor: '#fff',
+          borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: '20px 20px 24px',
+          boxShadow: '0 -6px 24px rgba(0,0,0,0.15)', fontFamily: "'Playfair Display', Georgia, serif",
+        }}
+      >
+        <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#DDD9D3', margin: '0 auto 16px' }} />
+
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 18 }}>
+          <img src={product.image} alt={product.name} style={{ width: 52, height: 52, borderRadius: 10, objectFit: 'cover', backgroundColor: '#D8D3CB', flexShrink: 0 }} />
+          <div style={{ minWidth: 0 }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 2 }}>{product.name}</p>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#16A34A' }}>{fmt(product.price)}</span>
+          </div>
+        </div>
+
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#717171', marginBottom: 10 }}>Select a size</p>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+          {sizes.map(size => {
+            const active = selectedSize === size
+            return (
+              <button
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                style={{
+                  padding: '9px 16px', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer',
+                  border: `1.5px solid ${active ? '#1B5E3E' : '#DDD9D3'}`,
+                  backgroundColor: active ? '#EAF5EE' : '#fff',
+                  color: active ? '#1B5E3E' : '#1A1A1A',
+                }}
+              >
+                {size}
+              </button>
+            )
+          })}
+        </div>
+
+        <button
+          onClick={() => onConfirm(selectedSize)}
+          disabled={justAdded}
+          style={{
+            width: '100%', padding: '15px', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600,
+            cursor: justAdded ? 'default' : 'pointer',
+            backgroundColor: justAdded ? '#1B5E3E' : '#16A34A', color: '#fff',
+            transition: 'background-color 0.15s',
+          }}
+        >
+          {justAdded ? 'Added ✓' : 'Add to cart'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function WishlistPage({ wishlistItems, onBack, onRemove, onSetSize, onSetQuantity, onMoveToCart, onMoveAllToCart }: {
+  wishlistItems: WishlistItem[]
+  onBack: () => void
+  onRemove: (productId: number) => void
+  onSetSize: (productId: number, size: string) => void
+  onSetQuantity: (productId: number, delta: number) => void
+  onMoveToCart: (productId: number) => void
+  onMoveAllToCart: () => void
+}) {
+  const hasItems = wishlistItems.length > 0
+
+  return (
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF', fontFamily: "'Playfair Display', Georgia, serif" }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#F5F3EF', borderBottom: '1px solid #E8E4DE', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 16, fontWeight: 500 }}>
+          <BackIcon /> Back
+        </button>
+        <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>Wishlist</span>
+        <span style={{ width: 20 }} />
+      </div>
+
+      <div style={{ padding: '20px 20px 120px' }}>
+        {!hasItems && (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#717171' }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>🤍</div>
+            <p style={{ fontSize: 16 }}>Your wishlist is empty</p>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {wishlistItems.map(item => {
+            const sizes = getSizesForCategory(item.product.category)
+            return (
+              <div key={item.product.id} style={{ display: 'flex', gap: 12, backgroundColor: '#fff', borderRadius: 16, padding: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                <img
+                  src={item.product.image}
+                  alt={item.product.name}
+                  style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'cover', flexShrink: 0, backgroundColor: '#D8D3CB' }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 2 }}>{item.product.name}</p>
+                    <button
+                      onClick={() => onRemove(item.product.id)}
+                      aria-label="Remove from wishlist"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A9590', fontSize: 18, lineHeight: 1, flexShrink: 0, padding: 0 }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#16A34A' }}>{fmt(item.product.price)}</span>
+
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginTop: 8 }}>
+                    {sizes.length > 0 && (
+                      <select
+                        value={item.size}
+                        onChange={e => onSetSize(item.product.id, e.target.value)}
+                        style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', border: '1.5px solid #DDD9D3', borderRadius: 8, padding: '4px 6px', fontFamily: "'Playfair Display', Georgia, serif" }}
+                      >
+                        {sizes.map(s => <option key={s} value={s}>Size {s}</option>)}
+                      </select>
+                    )}
+
+                    <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #DDD9D3', borderRadius: 8, overflow: 'hidden' }}>
+                      <button
+                        onClick={() => onSetQuantity(item.product.id, -1)}
+                        aria-label="Decrease quantity"
+                        style={{ width: 26, height: 26, border: 'none', background: '#F5F3EF', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+                      >
+                        −
+                      </button>
+                      <span style={{ width: 26, textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{item.quantity}</span>
+                      <button
+                        onClick={() => onSetQuantity(item.product.id, 1)}
+                        aria-label="Increase quantity"
+                        style={{ width: 26, height: 26, border: 'none', background: '#F5F3EF', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => onMoveToCart(item.product.id)}
+                    style={{ marginTop: 10, width: '100%', padding: '8px', border: 'none', borderRadius: 8, backgroundColor: '#16A34A', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    Add to cart
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {hasItems && (
+        <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 420, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 30 }}>
+          <button
+            onClick={onMoveAllToCart}
+            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Add all to cart
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CartPage({ cartItems, onBack, onRemove, onSetQuantity, onCheckout }: {
+  cartItems: CartItem[]
+  onBack: () => void
+  onRemove: (productId: number) => void
+  onSetQuantity: (productId: number, delta: number) => void
+  onCheckout: () => void
+}) {
+  const hasItems = cartItems.length > 0
+  const subtotal = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0)
+  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
+
+  return (
+    <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF', fontFamily: "'Playfair Display', Georgia, serif" }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#F5F3EF', borderBottom: '1px solid #E8E4DE', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 16, fontWeight: 500 }}>
+          <BackIcon /> Back
+        </button>
+        <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>Your cart</span>
+        <span style={{ width: 20 }} />
+      </div>
+
+      <div style={{ padding: '20px 20px 140px' }}>
+        {!hasItems && (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#717171' }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>🛍</div>
+            <p style={{ fontSize: 16 }}>Your cart is empty</p>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {cartItems.map(item => (
+            <div key={item.product.id} style={{ display: 'flex', gap: 12, backgroundColor: '#fff', borderRadius: 16, padding: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <img
+                src={item.product.image}
+                alt={item.product.name}
+                style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'cover', flexShrink: 0, backgroundColor: '#D8D3CB' }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 2 }}>{item.product.name}</p>
+                  <button
+                    onClick={() => onRemove(item.product.id)}
+                    aria-label="Remove from cart"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A9590', fontSize: 18, lineHeight: 1, flexShrink: 0, padding: 0 }}
+                  >
+                    ×
+                  </button>
+                </div>
+                <span style={{ fontSize: 16, fontWeight: 700, color: '#16A34A' }}>{fmt(item.product.price * item.quantity)}</span>
+
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 8, border: '1.5px solid #DDD9D3', borderRadius: 8, width: 'fit-content', overflow: 'hidden' }}>
+                  <button
+                    onClick={() => onSetQuantity(item.product.id, -1)}
+                    aria-label="Decrease quantity"
+                    style={{ width: 26, height: 26, border: 'none', background: '#F5F3EF', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+                  >
+                    −
+                  </button>
+                  <span style={{ width: 26, textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>{item.quantity}</span>
+                  <button
+                    onClick={() => onSetQuantity(item.product.id, 1)}
+                    aria-label="Increase quantity"
+                    style={{ width: 26, height: 26, border: 'none', background: '#F5F3EF', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {hasItems && (
+        <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 420, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 30 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: '#717171' }}>Total</span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
+          </div>
+          <button
+            onClick={onCheckout}
+            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Proceed to checkout
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -515,7 +908,12 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
   const [qty, setQty] = useState(1)
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-  const sizes = ['S', 'M', 'L', 'XL', '2XL']
+
+  const sizes = getSizesForCategory(product.category)
+
+  useEffect(() => {
+    setSelectedSize(sizes[0] ?? '')
+  }, [product.id])
 
   // "Customers also bought" — prefer same category, fall back to other products in the same line
   const related = ALL_PRODUCTS
@@ -583,6 +981,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
           {product.name} — {product.category}. Comfortable, everyday quality designed to last.
         </p>
 
+        {sizes.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <p style={{ fontSize: 15, fontWeight: 600, color: '#717171', marginBottom: 10 }}>Size</p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -605,6 +1004,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
             })}
           </div>
         </div>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 26 }}>
           <p style={{ fontSize: 15, fontWeight: 600, color: '#717171' }}>Quantity</p>
@@ -662,11 +1062,10 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
   )
 }
 
-function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: CheckoutStep; onStepChange: (s: CheckoutStep) => void; onBack: () => void; cartItems: CartItem[] }) {
+function CheckoutPage({ step, onStepChange, onBack, cartItems, onRemoveFromCart, onUpdateCartQuantity }: { step: CheckoutStep; onStepChange: (s: CheckoutStep) => void; onBack: () => void; cartItems: CartItem[]; onRemoveFromCart: (productId: number) => void; onUpdateCartQuantity: (productId: number, delta: number) => void }) {
   const steps: { label: string; n: CheckoutStep }[] = [
     { label: 'Delivery', n: 1 },
     { label: 'Payment', n: 2 },
-    { label: 'Confirm', n: 3 },
   ]
 
   const [delivery, setDelivery] = useState<DeliveryInfo>({
@@ -675,8 +1074,10 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
   const [method, setMethod] = useState<PaymentMethod>('mobile_money')
   const [mobileNumber, setMobileNumber] = useState('')
   const [showValidation, setShowValidation] = useState(false)
+  const [showCartEmptyError, setShowCartEmptyError] = useState(false)
 
   const isContactInfoValid = delivery.firstName.trim() !== '' && delivery.phone.trim() !== '' && delivery.area.trim() !== ''
+  const isCartEmpty = cartItems.length === 0
 
   const sendToWhatsApp = () => {
     const message = buildWhatsAppMessage(cartItems, delivery, method, mobileNumber)
@@ -685,13 +1086,27 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
   }
 
   const handlePrimaryAction = () => {
+    if (step === 2 && isCartEmpty) {
+      // Block confirming payment on an empty cart
+      setShowCartEmptyError(true)
+      return
+    }
     if (step === 2 && !isContactInfoValid) {
       // Block advancing to Confirm until name, phone, and location are filled
       setShowValidation(true)
       return
     }
+    if (step === 2) {
+      // Confirm & Pay sends the order straight to WhatsApp — no separate confirm page
+      sendToWhatsApp()
+      return
+    }
     onStepChange((step + 1) as CheckoutStep)
   }
+
+  useEffect(() => {
+    if (!isCartEmpty) setShowCartEmptyError(false)
+  }, [isCartEmpty])
 
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF', fontFamily: "'Playfair Display', Georgia, serif" }}>
@@ -708,10 +1123,12 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
       </div>
 
       <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
+        {step === 2 && (
         <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 64, zIndex: 25 }}>
           <span style={{ fontSize: 18 }}>🚚</span>
           <span style={{ fontSize: 16 }}>Get free delivery on orders over 300k</span>
         </div>
+        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {steps.map((s, i) => {
             const done = step > s.n
@@ -741,26 +1158,16 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
 
       <div style={{ padding: '24px 20px 100px' }}>
         {step === 1 && <DeliveryStep cartItems={cartItems} delivery={delivery} setDelivery={setDelivery} />}
-        {step === 2 && <PaymentStep cartItems={cartItems} method={method} setMethod={setMethod} mobileNumber={mobileNumber} setMobileNumber={setMobileNumber} delivery={delivery} setDelivery={setDelivery} showValidation={showValidation} />}
-        {step === 3 && <ConfirmStep cartItems={cartItems} />}
+        {step === 2 && <PaymentStep cartItems={cartItems} method={method} setMethod={setMethod} mobileNumber={mobileNumber} setMobileNumber={setMobileNumber} delivery={delivery} setDelivery={setDelivery} showValidation={showValidation} showCartEmptyError={showCartEmptyError} onRemoveFromCart={onRemoveFromCart} onUpdateCartQuantity={onUpdateCartQuantity} />}
       </div>
 
       <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 420, padding: '14px 20px', backgroundColor: 'rgba(245,243,239,0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid #E8E4DE', zIndex: 30 }}>
-        {step < 3 ? (
-          <button
-            onClick={handlePrimaryAction}
-            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
-          >
-            {step === 1 ? 'Continue to Payment' : 'Confirm & Pay'}
-          </button>
-        ) : (
-          <button
-            onClick={sendToWhatsApp}
-            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
-          >
-            Track my order
-          </button>
-        )}
+        <button
+          onClick={handlePrimaryAction}
+          style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
+        >
+          {step === 1 ? 'Continue to Payment' : 'Confirm & Pay'}
+        </button>
       </div>
     </div>
   )
@@ -807,11 +1214,10 @@ function DeliveryStep({ cartItems, delivery, setDelivery }: { cartItems: CartIte
   )
 }
 
-function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumber, delivery, setDelivery, showValidation }: { cartItems: CartItem[]; method: PaymentMethod; setMethod: Dispatch<SetStateAction<PaymentMethod>>; mobileNumber: string; setMobileNumber: Dispatch<SetStateAction<string>>; delivery: DeliveryInfo; setDelivery: Dispatch<SetStateAction<DeliveryInfo>>; showValidation: boolean }) {
+function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumber, delivery, setDelivery, showValidation, showCartEmptyError, onRemoveFromCart, onUpdateCartQuantity }: { cartItems: CartItem[]; method: PaymentMethod; setMethod: Dispatch<SetStateAction<PaymentMethod>>; mobileNumber: string; setMobileNumber: Dispatch<SetStateAction<string>>; delivery: DeliveryInfo; setDelivery: Dispatch<SetStateAction<DeliveryInfo>>; showValidation: boolean; showCartEmptyError: boolean; onRemoveFromCart: (productId: number) => void; onUpdateCartQuantity: (productId: number, delta: number) => void }) {
   const methods: { key: PaymentMethod; title: string; subtitle: string }[] = [
     { key: 'mobile_money', title: 'Mobile Money', subtitle: 'MTN and Airtel accepted' },
     { key: 'cash', title: 'Cash on delivery', subtitle: 'Pay when your order arrives' },
-    { key: 'card', title: 'Card payment', subtitle: 'Visa and Mastercard' },
   ]
 
   const fullName = `${delivery.firstName} ${delivery.lastName}`.trim()
@@ -906,69 +1312,96 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
         </div>
       )}
 
-      <OrderSummary items={cartItems} />
+      <CartItemsPreview items={cartItems} onRemove={onRemoveFromCart} />
+
+      <OrderSummary items={cartItems} highlightEmpty={showCartEmptyError} onRemove={onRemoveFromCart} onSetQuantity={onUpdateCartQuantity} />
     </div>
   )
 }
 
-function ConfirmStep({ cartItems }: { cartItems: CartItem[] }) {
-  const subtotal = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0)
-  const hasItems = cartItems.length > 0
-  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
+function CartItemsPreview({ items, onRemove }: { items: CartItem[]; onRemove?: (productId: number) => void }) {
+  if (items.length === 0) return null
   return (
-    <div style={{ textAlign: 'center', paddingTop: 20 }}>
-      <div style={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: '#C8E6D4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>
-        ✅
-      </div>
-      <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, fontFamily: "'Playfair Display', serif" }}>Order placed!</h2>
-      <p style={{ fontSize: 16, color: '#717171', marginBottom: 28, lineHeight: 1.6 }}>
-        Your order has been received.<br />We will contact you to confirm delivery.
-      </p>
-      <div style={{ background: '#fff', borderRadius: 18, padding: '20px', textAlign: 'left', marginBottom: 20 }}>
-        <p style={{ fontSize: 15, fontWeight: 600, color: '#717171', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Order summary</p>
-        {cartItems.map(item => (
-          <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-            <span style={{ fontSize: 16, color: '#1A1A1A' }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
-            <span style={{ fontSize: 18, fontWeight: 500 }}>{fmt(item.product.price * item.quantity)}</span>
+    <div style={{ marginBottom: 20 }}>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#717171', marginBottom: 10 }}>Items in your cart</p>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+        {items.map(item => (
+          <div key={item.product.id} style={{ flexShrink: 0, width: 84, backgroundColor: '#fff', borderRadius: 12, padding: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', borderRadius: 8, overflow: 'hidden', backgroundColor: '#D8D3CB', marginBottom: 6 }}>
+              <img src={item.product.image} alt={item.product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {item.quantity > 1 && (
+                <span style={{ position: 'absolute', top: 4, right: 4, backgroundColor: '#16A34A', color: '#fff', fontSize: 10, fontWeight: 700, width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {item.quantity}
+                </span>
+              )}
+              {onRemove && (
+                <button
+                  onClick={() => onRemove(item.product.id)}
+                  aria-label="Remove from cart"
+                  style={{ position: 'absolute', top: 4, left: 4, width: 18, height: 18, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.95)', border: 'none', cursor: 'pointer', color: '#9A9590', fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <p className="line-clamp-2" style={{ fontSize: 11, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.25 }}>{item.product.name}</p>
           </div>
         ))}
-        {hasItems && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-            <span style={{ fontSize: 16, color: '#717171' }}>Delivery</span>
-            <span style={{ fontSize: 18 }}>{fmt(DELIVERY_FEE)}</span>
-          </div>
-        )}
-        <div style={{ borderTop: '1px solid #E8E4DE', paddingTop: 14, display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 17, fontWeight: 700 }}>Total</span>
-          <span style={{ fontSize: 24, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
-        </div>
-      </div>
-      <div style={{ background: '#EAF5EE', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 20 }}>📦</span>
-        <div style={{ textAlign: 'left' }}>
-          <p style={{ fontSize: 15, fontWeight: 600, color: '#1B5E3E' }}>Estimated delivery: 1–2 days</p>
-          <p style={{ fontSize: 14, color: '#2D7A56' }}>Our team will call to confirm time</p>
-        </div>
       </div>
     </div>
   )
 }
 
-function OrderSummary({ items }: { items: CartItem[] }) {
+function OrderSummary({ items, highlightEmpty, onRemove, onSetQuantity }: { items: CartItem[]; highlightEmpty?: boolean; onRemove?: (productId: number) => void; onSetQuantity?: (productId: number, delta: number) => void }) {
   const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0)
   const hasItems = items.length > 0
   const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
+  const editable = !!(onRemove && onSetQuantity)
 
   return (
-    <div style={{ backgroundColor: '#E8E4DE', borderRadius: 18, padding: '18px 20px' }}>
+    <div style={{ backgroundColor: '#E8E4DE', borderRadius: 18, padding: '18px 20px', border: highlightEmpty && !hasItems ? '1.5px solid #DC2626' : '1.5px solid transparent', transition: 'border-color 0.15s' }}>
       <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 14 }}>Order summary</p>
       {!hasItems && (
-        <p style={{ fontSize: 15.5, color: '#717171', marginBottom: 14 }}>Your cart is empty</p>
+        <p style={{ fontSize: 15.5, color: highlightEmpty ? '#DC2626' : '#717171', fontWeight: highlightEmpty ? 700 : 400, marginBottom: 14 }}>
+          {highlightEmpty ? '⚠ Your cart is empty — add items before paying' : 'Your cart is empty'}
+        </p>
       )}
       {items.map(item => (
-        <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-          <span style={{ fontSize: 15.5, color: '#1A1A1A', flex: 1, marginRight: 12, lineHeight: 1.4 }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
-          <span style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A', flexShrink: 0 }}>{fmt(item.product.price * item.quantity)}</span>
+        <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 8 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ fontSize: 15.5, color: '#1A1A1A', lineHeight: 1.4, display: 'block' }}>{item.product.name}{!editable && item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
+            {editable && (
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: 6, border: '1.5px solid #D0CDC7', borderRadius: 8, width: 'fit-content', overflow: 'hidden', backgroundColor: '#fff' }}>
+                <button
+                  onClick={() => onSetQuantity!(item.product.id, -1)}
+                  aria-label="Decrease quantity"
+                  style={{ width: 24, height: 24, border: 'none', background: 'transparent', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+                >
+                  −
+                </button>
+                <span style={{ width: 22, textAlign: 'center', fontSize: 12.5, fontWeight: 600, color: '#1A1A1A' }}>{item.quantity}</span>
+                <button
+                  onClick={() => onSetQuantity!(item.product.id, 1)}
+                  aria-label="Increase quantity"
+                  style={{ width: 24, height: 24, border: 'none', background: 'transparent', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
+                >
+                  +
+                </button>
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <span style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A' }}>{fmt(item.product.price * item.quantity)}</span>
+            {editable && (
+              <button
+                onClick={() => onRemove!(item.product.id)}
+                aria-label="Remove from cart"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A9590', fontSize: 18, lineHeight: 1, padding: 0 }}
+              >
+                ×
+              </button>
+            )}
+          </div>
         </div>
       ))}
       {hasItems && (

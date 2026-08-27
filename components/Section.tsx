@@ -11,13 +11,12 @@ export default function Section() {
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
       style={{
-        position: 'fixed',
-        right: 20,
-        bottom: 24,
-        zIndex: 999,
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 6,
+        width: 'fit-content',
+        margin: '0 auto',
         padding: '8px 12px 8px 10px',
         borderRadius: 999,
         background: '#16A34A',

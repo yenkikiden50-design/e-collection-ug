@@ -13,11 +13,13 @@ interface CategoryMenuItem {
 interface NavbarProps {
   cartCount: number
   onCheckout: () => void
+  wishlistCount: number
+  onWishlist: () => void
   categories: CategoryMenuItem[]
   onSelectCategory: (line: string, category: string) => void
 }
 
-export default function Navbar({ cartCount, onCheckout, categories, onSelectCategory }: NavbarProps) {
+export default function Navbar({ cartCount, onCheckout, wishlistCount, onWishlist, categories, onSelectCategory }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleSelect = (item: CategoryMenuItem) => {
@@ -66,22 +68,39 @@ export default function Navbar({ cartCount, onCheckout, categories, onSelectCate
               />
             </div>
 
-            <button
-              onClick={onCheckout}
-              className="relative border-none bg-transparent p-0 text-[#1A1A1A]"
-              aria-label="View cart"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-              {cartCount > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C4562A] text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onWishlist}
+                className="relative border-none bg-transparent p-0 text-[#1A1A1A]"
+                aria-label="View wishlist"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
+                </svg>
+                {wishlistCount > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C4562A] text-[10px] font-bold text-white">
+                    {wishlistCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={onCheckout}
+                className="relative border-none bg-transparent p-0 text-[#1A1A1A]"
+                aria-label="View cart"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C4562A] text-[10px] font-bold text-white">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
         </header>
       </div>
