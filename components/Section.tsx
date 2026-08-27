@@ -27,7 +27,7 @@ export default function Section() {
       <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <FontAwesomeIcon icon={faWhatsapp} style={{ color: 'white', width: 16, height: 16 }} />
       </span>
-      <span style={{ color: '#fff', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>Let's chat</span>
+      <span style={{ color: '#fff', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>E-Collections</span>
     </a>
   )
 }

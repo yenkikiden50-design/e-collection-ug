@@ -59,7 +59,12 @@ const LADIES_PRODUCTS: Product[] = [
   { id: 14, name: 'Louis Vuitton bag', price: 120000, category: 'Bags', image: '/images/ladies/bag1.jpg' },
   { id: 15, name: 'Pushin sandals', price: 35000, category: 'Footwear', image: '/images/men/shoes/shoe12.jpg' },
   { id: 16, name: 'Flat sandals', price: 25000, category: 'Footwear', image: '/images/men/shoes/shoe.jpg' },
-
+  { id: 17, name: 'Silk pajama set', price: 58000, originalPrice: 72000, discount: 19, category: 'Night wear', image: '/images/ladies/nightwear1.jpg', tag: 'Bestseller' },
+  { id: 18, name: 'Cotton nightdress', price: 35000, category: 'Night wear', image: '/images/ladies/nightwear2.jpg' },
+  { id: 19, name: 'Satin robe', price: 45000, category: 'Night wear', image: '/images/ladies/nightwear3.jpg', tag: 'New' },
+  { id: 20, name: 'Lace-trim chemise', price: 40000, originalPrice: 52000, discount: 23, category: 'Night wear', image: '/images/ladies/nightwear4.jpg' },
+  { id: 21, name: 'Cotton nightdress', price: 35000, category: 'Night wear', image: '/images/ladies/nightwear5.jpg' },
+  { id: 22, name: 'Cotton nightdress', price: 45000, category: 'Night wear', image: '/images/ladies/nightwear6.jpg' },
 
 ]
 
@@ -102,6 +107,10 @@ const MENS_PRODUCTS: Product[] = [
   { id: 136, name: 'Mens Leather', price: 280000, category: 'Shoes', image: '/images/men/shoes/shoe9.jpg' },
   { id: 137, name: 'Timberland boots', price: 150000, category: 'Shoes', image: '/images/men/shoes/shoe5.jpg' },
   { id: 138, name: 'Mens leather ', price: 280000, category: 'Trousers', image: '/images/men/shoes/shoe13.jpg',  },
+  { id: 139, name: 'Cotton briefs 3-pack', price: 32000, category: 'Briefs', image: '/images/men/menbrief1.jpg', tag: 'Bestseller' },
+  { id: 140, name: 'Sport boxer briefs', price: 28000, originalPrice: 36000, discount: 22, category: 'Briefs', image: '/images/men/menbrief2.jpg' },
+  { id: 141, name: 'Classic nighties', price: 25000, category: 'Briefs', image: '/images/men/mennight.jpg', tag: 'New' },
+  { id: 142, name: 'Classic socks', price: 20000, category: 'Briefs', image: '/images/men/shirts/sock2.jpg', tag: 'New' },
 
 ]
 
@@ -114,22 +123,32 @@ const ELECTRONICS_PRODUCTS: Product[] = [
   { id: 208, name: 'Power bank 20000mAh', price: 55000, category: 'Accessories', image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=520&fit=crop&auto=format' },
 ]
 
-// TODO: add products here once available — the pill will show an empty state until then.
 const BEDDINGS_PRODUCTS: Product[] = [
+  { id: 301, name: 'Cotton bath towel set', price: 42000, originalPrice: 52000, discount: 19, category: 'Towels', image: '/images/beddings/bedsheet5.jpg', tag: 'Bestseller' },
+  { id: 302, name: 'Egyptian cotton hand towels', price: 18000, category: 'Towels', image: '/images/beddings/bedsheet4.jpg' },
+  { id: 303, name: '100% cotton bedsheet set', price: 65000, originalPrice: 80000, discount: 19, category: 'Bedsheets', image: '/images/beddings/bedsheet3.jpg', tag: 'New' },
+  { id: 304, name: 'Microfiber fitted bedsheet', price: 38000, category: 'Bedsheets', image: '/images/beddings/bedsheet1.jpg' },
+  { id: 305, name: 'All-season duvet', price: 78000, originalPrice: 115000, discount: 17, category: 'Duvets', image: '/images/beddings/bedsheet7.jpg', tag: 'Bestseller' },
+  { id: 306, name: 'Quilted duvet cover set', price: 95000, category: 'Duvets', image: '/images/beddings/bedsheet8.jpg', tag: 'New' },
+  { id: 307, name: 'All-season duvet', price: 78000, category: 'Duvets', image: '/images/beddings/bedsheet9.jpg', tag: 'New' },
+  { id: 308, name: 'All-season duvet', price: 78000, category: 'Duvets', image: '/images/beddings/bedsheet10.jpg', tag: 'New' },
+  { id: 309, name: 'Microfiber fitted bedsheet', price: 38000, category: 'Bedsheets', image: '/images/beddings/bedsheet2.jpg' },
+  { id: 310, name: 'Cotton bedsheet', price: 38000, category: 'Bedsheets', image: '/images/beddings/bedsheet6.jpg' },
 ]
 
 const ALL_PRODUCTS: Product[] = [
   ...LADIES_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
   ...MENS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
   ...ELECTRONICS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
+  ...BEDDINGS_PRODUCTS.map(p => ({ ...p, id: p.id + 10000 })),
 ]
 
 const CATEGORIES_BY_LINE: Record<NavLine, string[]> = {
-  'Store': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Phones', 'Audio', 'Wearables', 'Accessories'],
-  'Ladies line': ['All', 'Dresses', 'Tops', 'Footwear', 'Bags', 'Pants', 'Caps'],
-  'GentleMen': ['All', 'Shirts', 'Trousers', 'Shoes', 'Jackets', 'Jerseys', 'Bags', 'Caps'],
+  'Store': ['All', 'Dresses', 'Tops', 'Night wear', 'Footwear', 'Bags', 'Pants', 'Caps', 'Shirts', 'Trousers', 'Briefs', 'Shoes', 'Jackets', 'Jerseys', 'Phones', 'Audio', 'Wearables', 'Accessories', 'Towels', 'Bedsheets', 'Duvets'],
+  'Ladies line': ['All', 'Dresses', 'Tops', 'Night wear', 'Footwear', 'Bags', 'Pants', 'Caps'],
+  'GentleMen': ['All', 'Shirts', 'Trousers', 'Briefs', 'Shoes', 'Jackets', 'Jerseys', 'Bags', 'Caps'],
   'Personal Tech': ['All', 'Phones', 'Audio', 'Wearables', 'Accessories'],
-  'Beddings': ['All'],
+  'Beddings': ['All', 'Towels', 'Bedsheets', 'Duvets'],
 }
 
 const PRODUCTS_BY_LINE: Record<NavLine, Product[]> = {
@@ -151,12 +170,14 @@ const CATEGORY_MENU: CategoryMenuItem[] = [
   { label: 'All products', line: 'Store', category: 'All' },
   { label: 'Dresses', line: 'Ladies line', category: 'Dresses' },
   { label: 'Tops', line: 'Ladies line', category: 'Tops' },
+  { label: 'Night wear', line: 'Ladies line', category: 'Night wear' },
   { label: 'Footwear', line: 'Ladies line', category: 'Footwear' },
   { label: 'Pants', line: 'Ladies line', category: 'Pants' },
   { label: 'Bags', line: 'Ladies line', category: 'Bags' },
   { label: 'Caps', line: 'Ladies line', category: 'Caps' },
   { label: 'Shirts', line: 'GentleMen', category: 'Shirts' },
   { label: 'Trousers', line: 'GentleMen', category: 'Trousers' },
+  { label: 'Briefs', line: 'GentleMen', category: 'Briefs' },
   { label: 'Shoes', line: 'GentleMen', category: 'Shoes' },
   { label: 'Jackets', line: 'GentleMen', category: 'Jackets' },
   { label: 'Jerseys', line: 'GentleMen', category: 'Jerseys' },
@@ -165,11 +186,13 @@ const CATEGORY_MENU: CategoryMenuItem[] = [
   { label: 'Wearables', line: 'Personal Tech', category: 'Wearables' },
   { label: 'Accessories', line: 'Personal Tech', category: 'Accessories' },
   { label: 'Beddings', line: 'Beddings', category: 'All' },
+  { label: 'Towels', line: 'Beddings', category: 'Towels' },
+  { label: 'Bedsheets', line: 'Beddings', category: 'Bedsheets' },
+  { label: 'Duvets', line: 'Beddings', category: 'Duvets' },
 ]
 
-const DELIVERY_FEE = 5000
 // WhatsApp number in full international format, no leading 0 or +
-const WHATSAPP_NUMBER = '256746240983'
+const WHATSAPP_NUMBER = '256751792211'
 
 function fmt(n: number) {
   return `UGX ${n.toLocaleString()}`
@@ -180,6 +203,8 @@ function getSizesForCategory(category: string): string[] {
   if (category === 'Shoes') return Array.from({ length: 9 }, (_, i) => String(37 + i)) // 37–45
   if (category === 'Footwear') return Array.from({ length: 6 }, (_, i) => String(37 + i)) // 37–42
   if (category === 'Bags') return []
+  if (category === 'Phones' || category === 'Audio' || category === 'Wearables' || category === 'Accessories') return []
+  if (category === 'Bedsheets' || category === 'Duvets') return ['4 by 6', '5 by 6', '6 by 6']
   return ['S', 'M', 'L', 'XL', '2XL']
 }
 
@@ -219,11 +244,8 @@ function buildWhatsAppMessage(cartItems: CartItem[], delivery: DeliveryInfo, met
   lines.push('')
 
   const subtotal = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0)
-  const hasItems = cartItems.length > 0
-  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
   lines.push(`*Subtotal:* ${fmt(subtotal)}`)
-  if (hasItems) lines.push(`*Delivery:* ${fmt(DELIVERY_FEE)}`)
-  lines.push(`*Total:* ${fmt(total)}`)
+  lines.push(`*Total:* ${fmt(subtotal)}`)
   lines.push('')
 
   const methodLabel = method === 'mobile_money'
@@ -756,7 +778,7 @@ function CartPage({ cartItems, onBack, onRemove, onSetQuantity, onCheckout }: {
 }) {
   const hasItems = cartItems.length > 0
   const subtotal = cartItems.reduce((s, i) => s + i.product.price * i.quantity, 0)
-  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
+  const total = subtotal
 
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF', fontFamily: "'Playfair Display', Georgia, serif" }}>
@@ -1123,12 +1145,6 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems, onRemoveFromCart,
       </div>
 
       <div style={{ padding: '8px 24px 0', backgroundColor: '#F5F3EF' }}>
-        {step === 2 && (
-        <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 12, padding: '8px 14px', margin: '0 0 18px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, position: 'sticky', top: 64, zIndex: 25 }}>
-          {/* <span style={{ fontSize: 18 }}>🚚</span> */}
-          <span style={{ fontSize: 13 }}>Get free delivery on orders over 300k</span>
-        </div>
-        )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {steps.map((s, i) => {
             const done = step > s.n
@@ -1355,7 +1371,7 @@ function CartItemsPreview({ items, onRemove }: { items: CartItem[]; onRemove?: (
 function OrderSummary({ items, highlightEmpty, onRemove, onSetQuantity }: { items: CartItem[]; highlightEmpty?: boolean; onRemove?: (productId: number) => void; onSetQuantity?: (productId: number, delta: number) => void }) {
   const subtotal = items.reduce((s, i) => s + i.product.price * i.quantity, 0)
   const hasItems = items.length > 0
-  const total = hasItems ? subtotal + DELIVERY_FEE : subtotal
+  const total = subtotal
   const editable = !!(onRemove && onSetQuantity)
 
   return (
@@ -1404,12 +1420,6 @@ function OrderSummary({ items, highlightEmpty, onRemove, onSetQuantity }: { item
           </div>
         </div>
       ))}
-      {hasItems && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontSize: 15.5, color: '#717171' }}>Delivery</span>
-          <span style={{ fontSize: 18, color: '#1A1A1A' }}>{fmt(DELIVERY_FEE)}</span>
-        </div>
-      )}
       <div style={{ borderTop: '1.5px solid #D0CDC7', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A' }}>Total</span>
         <span style={{ fontSize: 24, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
