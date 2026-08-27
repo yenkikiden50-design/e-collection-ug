@@ -357,7 +357,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
                 key={item}
                 onClick={() => { setSelectedNav(item); setActiveCategory('All') }}
                 style={{
-                  padding: '7px 11px', borderRadius: 20, fontSize: 12, fontWeight: active ? 700 : 600,
+                  padding: '7px 11px', borderRadius: 20, fontSize: 14, fontWeight: active ? 700 : 600,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#16A34A' : '#F5F3EF',
@@ -379,7 +379,7 @@ function ListingPage({ cartItems, addToCart, removeOneFromCart, onCheckout, onVi
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 style={{
-                  padding: '7px 11px', borderRadius: 20, fontSize: 12, fontWeight: active ? 600 : 400,
+                  padding: '7px 11px', borderRadius: 20, fontSize: 14, fontWeight: active ? 600 : 400,
                   border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
                   transition: 'all 0.15s',
                   backgroundColor: active ? '#C8E6D4' : '#E8E4DE',
@@ -454,7 +454,7 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
       className="bg-white rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow"
     >
       {/* Image container: fixed aspect ratio, image clipped/fitted inside with rounded top corners */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-[#D8D3CB]">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-xl bg-[#D8D3CB]">
         {!imgError ? (
           <img
             src={product.image}
@@ -489,18 +489,18 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
 
       {/* Card body */}
       <div className="px-2 pt-1 pb-1.5">
-        <p className="text-[11.5px] font-normal text-[#1A1A1A] leading-tight mb-0.5 line-clamp-1">
+        <p className="text-[13px] font-normal text-[#1A1A1A] leading-tight mb-0.5 line-clamp-1">
           {product.name}
         </p>
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-[12px] font-medium text-[#16A34A]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.price)}</span>
+          <span className="text-[16px] font-medium text-[#16A34A]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.price)}</span>
           {product.originalPrice && (
-            <span className="text-[9px] text-[#9A9590] line-through" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.originalPrice)}</span>
+            <span className="text-[13px] text-[#9A9590] line-through" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.originalPrice)}</span>
           )}
         </div>
         <button
           onClick={e => { e.stopPropagation(); onAddToCart() }}
-          className="w-full mt-1 py-1 px-2 border-none rounded-lg bg-[#16A34A] text-white text-[9.5px] font-medium cursor-pointer hover:bg-[#128a3e] transition-colors"
+          className="w-full mt-1 py-2 px-2 border-none rounded-lg bg-[#16A34A] text-white text-[14px] font-medium cursor-pointer hover:bg-[#128a3e] transition-colors"
         >
           Add to cart
         </button>
@@ -529,7 +529,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#FFF', position: 'relative', fontFamily: "'Playfair Display', Georgia, serif" }}>
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#fff', borderBottom: '1px solid #E8E4DE' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px' }}>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 16, fontWeight: 500 }}>
             <BackIcon /> Back
           </button>
           <button
@@ -540,7 +540,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
             <CartIcon count={cartCount} />
           </button>
         </div>
-        <div style={{ padding: '0 20px 12px', fontSize: 12, color: '#9A9590', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+        <div style={{ padding: '0 20px 12px', fontSize: 14, color: '#9A9590', overflowX: 'auto', whiteSpace: 'nowrap' }}>
           Home <span style={{ margin: '0 4px' }}>/</span> {product.category} <span style={{ margin: '0 4px' }}>/</span>
           <span style={{ color: '#C4562A', fontWeight: 500 }}> {product.name}</span>
         </div>
@@ -572,19 +572,19 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
       </div>
 
       <div style={{ padding: '22px 20px 0' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.25, marginBottom: 12, fontFamily: "'Playfair Display', serif" }}>{product.name}</h1>
+        <h1 style={{ fontSize: 27, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.25, marginBottom: 12, fontFamily: "'Playfair Display', serif" }}>{product.name}</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-          <span style={{ fontSize: 20, fontWeight: 800, color: '#16A34A' }}>{fmt(product.price)}</span>
+          <span style={{ fontSize: 26, fontWeight: 800, color: '#16A34A' }}>{fmt(product.price)}</span>
           {product.originalPrice && (
-            <span style={{ fontSize: 14, color: '#9A9590', textDecoration: 'line-through' }}>{fmt(product.originalPrice)}</span>
+            <span style={{ fontSize: 18, color: '#9A9590', textDecoration: 'line-through' }}>{fmt(product.originalPrice)}</span>
           )}
         </div>
-        <p style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 1.6, marginBottom: 24 }}>
+        <p style={{ fontSize: 16, color: '#4A4A4A', lineHeight: 1.6, marginBottom: 24 }}>
           {product.name} — {product.category}. Comfortable, everyday quality designed to last.
         </p>
 
         <div style={{ marginBottom: 24 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#717171', marginBottom: 10 }}>Size</p>
+          <p style={{ fontSize: 15, fontWeight: 600, color: '#717171', marginBottom: 10 }}>Size</p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {sizes.map(size => {
               const active = selectedSize === size
@@ -593,7 +593,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
                   key={size}
                   onClick={() => setSelectedSize(size)}
                   style={{
-                    padding: '9px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                    padding: '9px 16px', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer',
                     border: `1.5px solid ${active ? '#1B5E3E' : '#DDD9D3'}`,
                     backgroundColor: active ? '#EAF5EE' : '#fff',
                     color: active ? '#1B5E3E' : '#1A1A1A',
@@ -607,7 +607,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 26 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#717171' }}>Quantity</p>
+          <p style={{ fontSize: 15, fontWeight: 600, color: '#717171' }}>Quantity</p>
           <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #DDD9D3', borderRadius: 10, overflow: 'hidden' }}>
             <button
               onClick={() => setQty(q => Math.max(1, q - 1))}
@@ -615,7 +615,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
             >
               −
             </button>
-            <span style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{qty}</span>
+            <span style={{ width: 36, textAlign: 'center', fontSize: 16, fontWeight: 600, color: '#1A1A1A' }}>{qty}</span>
             <button
               onClick={() => setQty(q => q + 1)}
               style={{ width: 34, height: 34, border: 'none', background: '#F5F3EF', fontSize: 16, fontWeight: 600, cursor: 'pointer', color: '#1A1A1A' }}
@@ -627,7 +627,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
 
         <button
           onClick={() => addToCart(product, qty)}
-          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 36, fontFamily: "'Playfair Display', Georgia, serif" }}
+          style={{ width: '100%', padding: '15px', backgroundColor: '#16A34A', color: '#fff', border: 'none', borderRadius: 14, fontSize: 19, fontWeight: 700, cursor: 'pointer', marginBottom: 36, fontFamily: "'Playfair Display', Georgia, serif" }}
         >
           Add to cart
         </button>
@@ -652,7 +652,7 @@ function ProductDetailPage({ product, cartItems, addToCart, onCheckout, onBack, 
                   />
                 </div>
                 <p style={{ fontSize: 12.5, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 4 }}>{p.name}</p>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#16A34A' }}>{fmt(p.price)}</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: '#16A34A' }}>{fmt(p.price)}</span>
               </button>
             ))}
           </div>
@@ -696,13 +696,13 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
   return (
     <div style={{ width: '100%', maxWidth: 420, margin: '0 auto', minHeight: '100vh', backgroundColor: '#F5F3EF', fontFamily: "'Playfair Display', Georgia, serif" }}>
       <div style={{ backgroundColor: '#F5F3EF', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E8E4DE', position: 'sticky', top: 0, zIndex: 30 }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500 }}>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A1A1A', display: 'flex', alignItems: 'center', gap: 6, fontSize: 16, fontWeight: 500 }}>
           <BackIcon /> Back
         </button>
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Playfair Display', serif" }}>E-Collections</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Playfair Display', serif" }}>E-Collections</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#717171', fontSize: 13 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#717171', fontSize: 15 }}>
           <LockIcon /> Secure checkout
         </div>
       </div>
@@ -710,7 +710,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
       <div style={{ padding: '20px 24px 0', backgroundColor: '#F5F3EF' }}>
         <div style={{ backgroundColor: '#F59E0B', color: '#fff', borderRadius: 14, padding: '14px 18px', margin: '0 0 16px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, position: 'sticky', top: 64, zIndex: 25 }}>
           <span style={{ fontSize: 18 }}>🚚</span>
-          <span style={{ fontSize: 14 }}>Get free delivery on orders over 300k</span>
+          <span style={{ fontSize: 16 }}>Get free delivery on orders over 300k</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {steps.map((s, i) => {
@@ -728,7 +728,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
                   }}>
                     {done ? <CheckIcon /> : s.n}
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: active ? 600 : 400, color: upcoming ? '#9A9590' : '#1A1A1A' }}>{s.label}</span>
+                  <span style={{ fontSize: 15, fontWeight: active ? 600 : 400, color: upcoming ? '#9A9590' : '#1A1A1A' }}>{s.label}</span>
                 </div>
                 {i < steps.length - 1 && (
                   <div style={{ flex: 1, height: 1.5, backgroundColor: done ? '#1B5E3E' : '#DDD9D3', margin: '0 10px', transition: 'background 0.2s' }} />
@@ -749,14 +749,14 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
         {step < 3 ? (
           <button
             onClick={handlePrimaryAction}
-            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
           >
             {step === 1 ? 'Continue to Payment' : 'Confirm & Pay'}
           </button>
         ) : (
           <button
             onClick={sendToWhatsApp}
-            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+            style={{ width: '100%', padding: '15px', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: 14, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}
           >
             Track my order
           </button>
@@ -769,7 +769,7 @@ function CheckoutPage({ step, onStepChange, onBack, cartItems }: { step: Checkou
 function DeliveryStep({ cartItems, delivery, setDelivery }: { cartItems: CartItem[]; delivery: DeliveryInfo; setDelivery: Dispatch<SetStateAction<DeliveryInfo>> }) {
   const inputStyle = {
     width: '100%', padding: '13px 15px', borderRadius: 12, border: '1.5px solid #DDD9D3',
-    backgroundColor: '#fff', fontSize: 14, color: '#1A1A1A', outline: 'none',
+    backgroundColor: '#fff', fontSize: 16, color: '#1A1A1A', outline: 'none',
     boxSizing: 'border-box' as const,
   }
   const update = (field: keyof DeliveryInfo) => (e: ChangeEvent<HTMLInputElement>) =>
@@ -777,29 +777,29 @@ function DeliveryStep({ cartItems, delivery, setDelivery }: { cartItems: CartIte
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, fontFamily: "'Playfair Display', serif" }}>Delivery details</h2>
+      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20, fontFamily: "'Playfair Display', serif" }}>Delivery details</h2>
       <OrderSummary items={cartItems} />
       <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>First name</label>
+            <label style={{ fontSize: 14, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>First name</label>
             <input style={inputStyle} placeholder="Amara" value={delivery.firstName} onChange={update('firstName')} />
           </div>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Last name</label>
+            <label style={{ fontSize: 14, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Last name</label>
             <input style={inputStyle} placeholder="Nakato" value={delivery.lastName} onChange={update('lastName')} />
           </div>
         </div>
         <div>
-          <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Phone number</label>
+          <label style={{ fontSize: 14, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Phone number</label>
           <input style={inputStyle} placeholder="07XX XXX XXX" value={delivery.phone} onChange={update('phone')} />
         </div>
         <div>
-          <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Delivery area</label>
+          <label style={{ fontSize: 14, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Delivery area</label>
           <input style={inputStyle} placeholder="e.g. Kampala, Wakiso" value={delivery.area} onChange={update('area')} />
         </div>
         <div>
-          <label style={{ fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Nearest landmark</label>
+          <label style={{ fontSize: 14, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' }}>Nearest landmark</label>
           <input style={inputStyle} placeholder="e.g. Next to Garden City mall" value={delivery.landmark} onChange={update('landmark')} />
         </div>
       </div>
@@ -824,12 +824,12 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
     backgroundColor: '#fff', fontSize: 14, color: '#1A1A1A', outline: 'none',
     boxSizing: 'border-box' as const,
   })
-  const labelStyle = { fontSize: 12, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' as const }
-  const errorTextStyle = { fontSize: 11, color: '#DC2626', marginTop: 4, display: 'block' as const }
+  const labelStyle = { fontSize: 14, fontWeight: 500, color: '#717171', marginBottom: 6, display: 'block' as const }
+  const errorTextStyle = { fontSize: 13, color: '#DC2626', marginTop: 4, display: 'block' as const }
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, fontFamily: "'Playfair Display', serif" }}>Payment method</h2>
+      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20, fontFamily: "'Playfair Display', serif" }}>Payment method</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
         {methods.map(m => {
           const active = method === m.key
@@ -847,8 +847,8 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
                 {active && <CheckIcon />}
               </div>
               <div>
-                <p style={{ fontSize: 15, fontWeight: 600, color: active ? '#1B5E3E' : '#1A1A1A', marginBottom: 2 }}>{m.title}</p>
-                <p style={{ fontSize: 13, color: active ? '#2D7A56' : '#717171' }}>{m.subtitle}</p>
+                <p style={{ fontSize: 17, fontWeight: 600, color: active ? '#1B5E3E' : '#1A1A1A', marginBottom: 2 }}>{m.title}</p>
+                <p style={{ fontSize: 15, color: active ? '#2D7A56' : '#717171' }}>{m.subtitle}</p>
               </div>
             </button>
           )
@@ -896,7 +896,7 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
 
       {method === 'mobile_money' && (
         <div style={{ marginBottom: 24 }}>
-          <label style={{ fontSize: 13, fontWeight: 500, color: '#717171', marginBottom: 8, display: 'block' }}>Mobile Money number</label>
+          <label style={{ fontSize: 15, fontWeight: 500, color: '#717171', marginBottom: 8, display: 'block' }}>Mobile Money number</label>
           <input
             value={mobileNumber}
             onChange={e => setMobileNumber(e.target.value)}
@@ -920,34 +920,34 @@ function ConfirmStep({ cartItems }: { cartItems: CartItem[] }) {
       <div style={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: '#C8E6D4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>
         ✅
       </div>
-      <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, fontFamily: "'Playfair Display', serif" }}>Order placed!</h2>
-      <p style={{ fontSize: 14, color: '#717171', marginBottom: 28, lineHeight: 1.6 }}>
+      <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, fontFamily: "'Playfair Display', serif" }}>Order placed!</h2>
+      <p style={{ fontSize: 16, color: '#717171', marginBottom: 28, lineHeight: 1.6 }}>
         Your order has been received.<br />We will contact you to confirm delivery.
       </p>
       <div style={{ background: '#fff', borderRadius: 18, padding: '20px', textAlign: 'left', marginBottom: 20 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#717171', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Order summary</p>
+        <p style={{ fontSize: 15, fontWeight: 600, color: '#717171', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Order summary</p>
         {cartItems.map(item => (
           <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-            <span style={{ fontSize: 14, color: '#1A1A1A' }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{fmt(item.product.price * item.quantity)}</span>
+            <span style={{ fontSize: 16, color: '#1A1A1A' }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
+            <span style={{ fontSize: 18, fontWeight: 500 }}>{fmt(item.product.price * item.quantity)}</span>
           </div>
         ))}
         {hasItems && (
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-            <span style={{ fontSize: 14, color: '#717171' }}>Delivery</span>
-            <span style={{ fontSize: 14 }}>{fmt(DELIVERY_FEE)}</span>
+            <span style={{ fontSize: 16, color: '#717171' }}>Delivery</span>
+            <span style={{ fontSize: 18 }}>{fmt(DELIVERY_FEE)}</span>
           </div>
         )}
         <div style={{ borderTop: '1px solid #E8E4DE', paddingTop: 14, display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 15, fontWeight: 700 }}>Total</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
+          <span style={{ fontSize: 17, fontWeight: 700 }}>Total</span>
+          <span style={{ fontSize: 24, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
         </div>
       </div>
       <div style={{ background: '#EAF5EE', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 20 }}>📦</span>
         <div style={{ textAlign: 'left' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#1B5E3E' }}>Estimated delivery: 1–2 days</p>
-          <p style={{ fontSize: 12, color: '#2D7A56' }}>Our team will call to confirm time</p>
+          <p style={{ fontSize: 15, fontWeight: 600, color: '#1B5E3E' }}>Estimated delivery: 1–2 days</p>
+          <p style={{ fontSize: 14, color: '#2D7A56' }}>Our team will call to confirm time</p>
         </div>
       </div>
     </div>
@@ -961,25 +961,25 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 
   return (
     <div style={{ backgroundColor: '#E8E4DE', borderRadius: 18, padding: '18px 20px' }}>
-      <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', marginBottom: 14 }}>Order summary</p>
+      <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 14 }}>Order summary</p>
       {!hasItems && (
-        <p style={{ fontSize: 13.5, color: '#717171', marginBottom: 14 }}>Your cart is empty</p>
+        <p style={{ fontSize: 15.5, color: '#717171', marginBottom: 14 }}>Your cart is empty</p>
       )}
       {items.map(item => (
         <div key={item.product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-          <span style={{ fontSize: 13.5, color: '#1A1A1A', flex: 1, marginRight: 12, lineHeight: 1.4 }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
-          <span style={{ fontSize: 13.5, fontWeight: 600, color: '#1A1A1A', flexShrink: 0 }}>{fmt(item.product.price * item.quantity)}</span>
+          <span style={{ fontSize: 15.5, color: '#1A1A1A', flex: 1, marginRight: 12, lineHeight: 1.4 }}>{item.product.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
+          <span style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A', flexShrink: 0 }}>{fmt(item.product.price * item.quantity)}</span>
         </div>
       ))}
       {hasItems && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontSize: 13.5, color: '#717171' }}>Delivery</span>
-          <span style={{ fontSize: 13.5, color: '#1A1A1A' }}>{fmt(DELIVERY_FEE)}</span>
+          <span style={{ fontSize: 15.5, color: '#717171' }}>Delivery</span>
+          <span style={{ fontSize: 18, color: '#1A1A1A' }}>{fmt(DELIVERY_FEE)}</span>
         </div>
       )}
       <div style={{ borderTop: '1.5px solid #D0CDC7', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Total</span>
-        <span style={{ fontSize: 20, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
+        <span style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A' }}>Total</span>
+        <span style={{ fontSize: 24, fontWeight: 800, color: '#1B5E3E' }}>{fmt(total)}</span>
       </div>
     </div>
   )
