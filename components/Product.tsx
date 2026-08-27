@@ -1244,7 +1244,7 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
               key={m.key}
               onClick={() => setMethod(m.key)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', borderRadius: 14, textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s',
+                display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s',
                 border: `2px solid ${active ? '#1B5E3E' : '#DDD9D3'}`,
                 backgroundColor: active ? '#EAF5EE' : '#fff',
               }}
@@ -1253,8 +1253,8 @@ function PaymentStep({ cartItems, method, setMethod, mobileNumber, setMobileNumb
                 {active && <CheckIcon />}
               </div>
               <div>
-                <p style={{ fontSize: 17, fontWeight: 600, color: active ? '#1B5E3E' : '#1A1A1A', marginBottom: 2 }}>{m.title}</p>
-                <p style={{ fontSize: 15, color: active ? '#2D7A56' : '#717171' }}>{m.subtitle}</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: active ? '#1B5E3E' : '#1A1A1A', marginBottom: 2 }}>{m.title}</p>
+                <p style={{ fontSize: 13, color: active ? '#2D7A56' : '#717171' }}>{m.subtitle}</p>
               </div>
             </button>
           )
