@@ -451,7 +451,7 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
   return (
     <div
       onClick={onViewProduct}
-      className="bg-white rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+      className="flex h-full flex-col bg-white rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow"
     >
       {/* Image container: fixed aspect ratio, image clipped/fitted inside with rounded top corners */}
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-xl bg-[#D8D3CB]">
@@ -488,19 +488,19 @@ function ProductCard({ product, wishlisted, onToggleWishlist, onAddToCart, onVie
       </div>
 
       {/* Card body */}
-      <div className="px-2 pt-1 pb-1.5">
-        <p className="text-[13px] font-normal text-[#1A1A1A] leading-tight mb-0.5 line-clamp-1">
+      <div className="flex flex-1 flex-col px-2 pt-1 pb-1.5">
+        <p className="text-[13px] font-bold text-[#1A1A1A] leading-tight mb-0.5 line-clamp-1">
           {product.name}
         </p>
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-[16px] font-medium text-[#16A34A]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.price)}</span>
+          <span className="text-[16px] font-bold text-[#16A34A]" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.price)}</span>
           {product.originalPrice && (
-            <span className="text-[13px] text-[#9A9590] line-through" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.originalPrice)}</span>
+            <span className="text-[13px] font-semibold text-[#9A9590] line-through" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{fmt(product.originalPrice)}</span>
           )}
         </div>
         <button
           onClick={e => { e.stopPropagation(); onAddToCart() }}
-          className="w-full mt-1 py-2 px-2 border-none rounded-lg bg-[#16A34A] text-white text-[14px] font-medium cursor-pointer hover:bg-[#128a3e] transition-colors"
+          className="w-full mt-auto py-2 px-2 border-none rounded-lg bg-[#16A34A] text-white text-[14px] font-medium cursor-pointer hover:bg-[#128a3e] transition-colors"
         >
           Add to cart
         </button>
